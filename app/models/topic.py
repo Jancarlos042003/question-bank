@@ -7,6 +7,7 @@ class Topic(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(150))
+    description: Mapped[str] = mapped_column(String(255))
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
 
     course: Mapped["Course"] = relationship()

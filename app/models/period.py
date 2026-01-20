@@ -7,4 +7,5 @@ class Period(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(10))
-    order_no: Mapped[int] = mapped_column(Integer, unique=True)
+    description: Mapped[str] = mapped_column(String(100))
+    code: Mapped[str] = mapped_column(String(3))
