@@ -99,18 +99,17 @@ class Solution(BaseModel):
 
 
 class QuestionBase(BaseModel):
-    difficulty_id: int
     topic_id: int
-    exam_id: int
-    question_number: Annotated[int, Field(gt=0)]
+    assessment_id: int
+    question_number: Annotated[Optional[int], Field(default=None, gt=0)]
     statement: Statement
     solution: Solution
-    type_question_id: Annotated[TypeQuestion, Field(
-        description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación")
-    ]
 
 
 class QuestionCreate(QuestionBase):
+    question_type_id: Annotated[TypeQuestion, Field(
+        description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación")
+    ]
     choices: Annotated[List[ChoiceCreate], Field(min_length=4, max_length=5, default_factory=list)]
 
     @field_validator("choices")
@@ -127,7 +126,7 @@ class QuestionCreate(QuestionBase):
     def validate_statement_type_consistency(self):
         """Valida que el tipo de statement coincida con `type_question_id`"""
         statement = self.statement
-        type_id = self.type_question_id
+        type_id = self.question_type_id
 
         match type_id:
             case TypeQuestion.DIRECT | TypeQuestion.COMPLETION:
@@ -150,7 +149,8 @@ class QuestionCreate(QuestionBase):
 class QuestionRead(QuestionBase):
     id: int
     question_hash: str
-    choices: Annotated[List[ChoiceRead], Field(default_factory=list)]
+    question_type_id: int
+    choices: List[ChoiceRead]
 
     model_config = ConfigDict(
         from_attributes=True
