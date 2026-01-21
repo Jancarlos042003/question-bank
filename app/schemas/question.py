@@ -132,11 +132,28 @@ class QuestionCreate(QuestionBase):
 
     @field_validator("choices")
     @classmethod
-    def validate_single_correct(cls, choices):
+    def validate_single_correct(cls, choices: List[ChoiceCreate]):
+        """Valida que exista exactamente una alternativa marcada como correcta (true)."""
         correct = sum(1 for c in choices if c.is_correct)
 
         if correct != 1:
             raise ValueError("Debe existir exactamente una alternativa correcta")
+
+        return choices
+
+    @field_validator("choices")
+    @classmethod
+    def validate_unique_responses(cls, choices: List[ChoiceCreate]):
+        """Valida que el contenido de las alternativas sea único."""
+        unique_choices = set()
+
+        for c in choices:
+            normalized = c.content.strip().lower()
+
+            if normalized in unique_choices:
+                raise ValueError("Las repuestas deben ser únicas")
+
+            unique_choices.add(normalized)
 
         return choices
 
