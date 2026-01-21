@@ -1,4 +1,4 @@
-from typing import Optional, Annotated
+from typing import Annotated
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -9,16 +9,16 @@ class AssessmentBase(BaseModel):
     assessment_type_id: int
     period_id: int
     sequence_number: Annotated[
-        Optional[int], Field(default=None, description="Indica el número de evaluación")
+        int | None, Field(default=None, description="Indica el número de evaluación")
     ]
     area_id: Annotated[
-        Optional[int],
+        int | None,
         Field(
             default=None,
             description="Especifica a que área pertenece o es de área general(NULL)",
         ),
     ]
-    modality_id: Annotated[Optional[int], Field(default=None)]
+    modality_id: Annotated[int | None, Field(default=None)]
 
 
 class AssessmentCreate(AssessmentBase):

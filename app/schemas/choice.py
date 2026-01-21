@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -12,7 +12,7 @@ class ChoiceBase(BaseModel):
         str, Field(description="Texto de la opción", examples=["Opción de ejemplo"])
     ]
     image_url: Annotated[
-        Optional[str],
+        str | None,
         Field(
             default=None,
             description="URL de una imagen asociada a la opción (opcional)",
