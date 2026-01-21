@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.crud.question import create_question, get_all_questions
@@ -10,7 +10,9 @@ from app.schemas.question import QuestionCreate, QuestionRead
 question_router = APIRouter()
 
 
-@question_router.post("", response_model=QuestionRead)
+@question_router.post(
+    "", response_model=QuestionRead, status_code=status.HTTP_201_CREATED
+)
 def add_question(question: QuestionCreate, db: Annotated[Session, Depends(get_db)]):
     return create_question(db, question)
 
