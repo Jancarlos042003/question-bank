@@ -8,14 +8,16 @@ class AssessmentBase(BaseModel):
     year: int
     assessment_type_id: int
     period_id: int
-    sequence_number: Annotated[Optional[int], Field(
-        default=None,
-        description="Indica el número de evaluación"
-    )]
-    area_id: Annotated[Optional[int], Field(
-        default=None,
-        description="Especifica a que área pertenece o es de área general(NULL)"
-    )]
+    sequence_number: Annotated[
+        Optional[int], Field(default=None, description="Indica el número de evaluación")
+    ]
+    area_id: Annotated[
+        Optional[int],
+        Field(
+            default=None,
+            description="Especifica a que área pertenece o es de área general(NULL)",
+        ),
+    ]
     modality_id: Annotated[Optional[int], Field(default=None)]
 
 
@@ -26,6 +28,4 @@ class AssessmentCreate(AssessmentBase):
 class AssessmentRead(AssessmentBase):
     id: int
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = ConfigDict(from_attributes=True)

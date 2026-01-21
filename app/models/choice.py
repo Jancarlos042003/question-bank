@@ -3,6 +3,7 @@ from sqlalchemy import String, Integer, Text, Boolean, ForeignKey
 from app.db.base import Base
 from typing import Optional
 
+
 class Choice(Base):
     __tablename__ = "choices"
 

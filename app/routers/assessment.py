@@ -10,8 +10,12 @@ from app.schemas.assessment import AssessmentRead, AssessmentCreate
 assessment_router = APIRouter()
 
 
-@assessment_router.post("", response_model=AssessmentRead, status_code=status.HTTP_201_CREATED)
-def add_assessment(db: Annotated[Session, Depends(get_db)], assessment: AssessmentCreate):
+@assessment_router.post(
+    "", response_model=AssessmentRead, status_code=status.HTTP_201_CREATED
+)
+def add_assessment(
+    db: Annotated[Session, Depends(get_db)], assessment: AssessmentCreate
+):
     return create_assessment(db, assessment)
 
 

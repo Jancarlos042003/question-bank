@@ -7,6 +7,8 @@ HOST = settings.DB_HOST
 PORT = settings.DB_PORT
 DBNAME = settings.DB_NAME
 
-DATABASE_URL = f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+DATABASE_URL = (
+    f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+)
 
 engine = create_engine(url=DATABASE_URL, echo=True, future=True)

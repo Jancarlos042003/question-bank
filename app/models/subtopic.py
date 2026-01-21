@@ -2,6 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, ForeignKey
 from app.db.base import Base
 
+
 class Subtopic(Base):
     __tablename__ = "subtopics"
 

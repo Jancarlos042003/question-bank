@@ -16,7 +16,7 @@ def create_choice(db: Session, question_id: int, choices: List[ChoiceCreate]):
                 content=choice.content,
                 image_url=choice.image_url,
                 is_correct=choice.is_correct,
-                question_id=question_id
+                question_id=question_id,
             )
             for choice in choices
         ]
@@ -31,6 +31,5 @@ def create_choice(db: Session, question_id: int, choices: List[ChoiceCreate]):
     except SQLAlchemyError:
         db.rollback()
         raise HTTPException(
-            status_code=500,
-            detail="Error al crear las respuestas de la pregunta"
+            status_code=500, detail="Error al crear las respuestas de la pregunta"
         )

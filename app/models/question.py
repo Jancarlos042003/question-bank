@@ -22,6 +22,5 @@ class Question(Base):
     question_type: Mapped["QuestionType"] = relationship()
 
     choices: Mapped[List["Choice"]] = relationship(
-        back_populates="question",
-        cascade="all, delete-orphan"
+        back_populates="question", cascade="all, delete-orphan"
     )

@@ -16,20 +16,15 @@ class TypeQuestion(IntEnum):
 
 class StatementItem(BaseModel):
     id: Annotated[
-        str,
-        Field(description="Identificador del ítem (I, II, III o A, B, C)")
+        str, Field(description="Identificador del ítem (I, II, III o A, B, C)")
     ]
     content: Annotated[str, Field(description="Contenido del ítem")]
 
 
 class StatementBase(BaseModel):
-    text: Annotated[
-        str,
-        Field(..., description="Enunciado principal de la pregunta")
-    ]
+    text: Annotated[str, Field(..., description="Enunciado principal de la pregunta")]
     image_urls: Annotated[
-        Optional[List[str]],
-        Field(description="URLs de imágenes")
+        Optional[List[str]], Field(description="URLs de imágenes")
     ] = None
 
 
@@ -39,14 +34,15 @@ class StatementWithItems(StatementBase):
     - True/False
     - Ordering
     """
+
     type: Literal["standard_with_items"] = "standard_with_items"
     items: Annotated[
         List[StatementItem],
         Field(
             min_length=2,
             max_length=5,
-            description="Lista de ítems asociados al enunciado"
-        )
+            description="Lista de ítems asociados al enunciado",
+        ),
     ]
 
 
@@ -56,32 +52,47 @@ class StatementWithoutItems(StatementBase):
     - Direct
     - Completion
     """
+
     type: Literal["standard_without_items"] = "standard_without_items"
 
 
 class MatchingStatement(StatementBase):
     """Pregunta de relacionar columnas"""
+
     type: Literal["matching"] = "matching"
-    left_column: Annotated[List[StatementItem], Field(
-        max_length=5,
-        description="Columna izquierda con items",
-        examples=[[
-            {"id": "1", "content": "Mitocondria"},
-            {"id": "2", "content": "Ribosoma"}
-        ]]
-    )]
-    right_column: Annotated[List[StatementItem], Field(
-        max_length=5,
-        description="Columna derecha con items",
-        examples=[[
-            {"id": "A", "content": "Síntesis de proteínas"},
-            {"id": "B", "content": "Producción de ATP"}
-        ]])]
+    left_column: Annotated[
+        List[StatementItem],
+        Field(
+            max_length=5,
+            description="Columna izquierda con items",
+            examples=[
+                [
+                    {"id": "1", "content": "Mitocondria"},
+                    {"id": "2", "content": "Ribosoma"},
+                ]
+            ],
+        ),
+    ]
+    right_column: Annotated[
+        List[StatementItem],
+        Field(
+            max_length=5,
+            description="Columna derecha con items",
+            examples=[
+                [
+                    {"id": "A", "content": "Síntesis de proteínas"},
+                    {"id": "B", "content": "Producción de ATP"},
+                ]
+            ],
+        ),
+    ]
 
     @model_validator(mode="after")
     def validate_same_length(self):
         if len(self.left_column) != len(self.right_column):
-            raise ValueError("Las columnas izquierda y derecha deben tener la misma cantidad de ítems")
+            raise ValueError(
+                "Las columnas izquierda y derecha deben tener la misma cantidad de ítems"
+            )
 
         return self
 
@@ -89,12 +100,14 @@ class MatchingStatement(StatementBase):
 # Union discriminada
 Statement = Annotated[
     StatementWithItems | StatementWithoutItems | MatchingStatement,
-    Field(discriminator="type")
+    Field(discriminator="type"),
 ]
 
 
 class Solution(BaseModel):
-    explanation: Annotated[str, Field(description="Explicación detallada de la solución")]
+    explanation: Annotated[
+        str, Field(description="Explicación detallada de la solución")
+    ]
     image_urls: Optional[List[str]] = None
 
 
@@ -107,10 +120,15 @@ class QuestionBase(BaseModel):
 
 
 class QuestionCreate(QuestionBase):
-    question_type_id: Annotated[TypeQuestion, Field(
-        description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación")
+    question_type_id: Annotated[
+        TypeQuestion,
+        Field(
+            description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación"
+        ),
     ]
-    choices: Annotated[List[ChoiceCreate], Field(min_length=4, max_length=5, default_factory=list)]
+    choices: Annotated[
+        List[ChoiceCreate], Field(min_length=4, max_length=5, default_factory=list)
+    ]
 
     @field_validator("choices")
     @classmethod
@@ -146,12 +164,11 @@ class QuestionCreate(QuestionBase):
 
         return self
 
+
 class QuestionRead(QuestionBase):
     id: int
     question_hash: str
     question_type_id: int
     choices: List[ChoiceRead]
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = ConfigDict(from_attributes=True)
