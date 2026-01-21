@@ -1,12 +1,12 @@
 from enum import IntEnum
-from typing import Annotated, List, Optional, Literal
+from typing import Annotated, List, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 
 from app.schemas.choice import ChoiceCreate, ChoiceRead
 
 
-class TypeQuestion(IntEnum):
+class QuestionType(IntEnum):
     DIRECT = 1
     TRUE_FALSE = 2
     MATCHING = 3
@@ -23,9 +23,9 @@ class StatementItem(BaseModel):
 
 class StatementBase(BaseModel):
     text: Annotated[str, Field(..., description="Enunciado principal de la pregunta")]
-    image_urls: Annotated[
-        Optional[List[str]], Field(description="URLs de imágenes")
-    ] = None
+    image_urls: Annotated[List[str] | None, Field(description="URLs de imágenes")] = (
+        None
+    )
 
 
 class StatementWithItems(StatementBase):
@@ -108,20 +108,20 @@ class Solution(BaseModel):
     explanation: Annotated[
         str, Field(description="Explicación detallada de la solución")
     ]
-    image_urls: Optional[List[str]] = None
+    image_urls: List[str] | None = None
 
 
 class QuestionBase(BaseModel):
     topic_id: int
     assessment_id: int
-    question_number: Annotated[Optional[int], Field(default=None, gt=0)]
+    question_number: Annotated[int | None, Field(default=None, gt=0)]
     statement: Statement
     solution: Solution
 
 
 class QuestionCreate(QuestionBase):
     question_type_id: Annotated[
-        TypeQuestion,
+        QuestionType,
         Field(
             description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación"
         ),
@@ -147,11 +147,11 @@ class QuestionCreate(QuestionBase):
         type_id = self.question_type_id
 
         match type_id:
-            case TypeQuestion.DIRECT | TypeQuestion.COMPLETION:
+            case QuestionType.DIRECT | QuestionType.COMPLETION:
                 expected_type = StatementWithoutItems
-            case TypeQuestion.TRUE_FALSE | TypeQuestion.ORDERING:
+            case QuestionType.TRUE_FALSE | QuestionType.ORDERING:
                 expected_type = StatementWithItems
-            case TypeQuestion.MATCHING:
+            case QuestionType.MATCHING:
                 expected_type = MatchingStatement
             case _:
                 raise ValueError(f"Tipo de pregunta desconocido: {type_id}")
