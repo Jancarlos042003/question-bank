@@ -9,6 +9,7 @@ dependencies = [
     "google-cloud-storage>=3.8.0",
     "psycopg[binary]>=3.3.2",
     "pydantic-settings>=2.12.0",
+    "python-multipart>=0.0.21",
     "sqlalchemy>=2.0.45",
     "uvicorn>=0.40.0",
 ]
