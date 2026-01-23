@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1c8eefe2-e8d7-45a0-850d-0ea00e5cbcc2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/question-bank.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_D:/Proyectos/PythonProject/question-bank" value="38JCwCJjbjK0BpNeirV6hawmBtG" />
+    </persistenceIdMap>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FastAPI main" />
+        <option value="FastAPI test_main" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HttpClientOnboardingState">{
+  &quot;isOnboardingCommentShown&quot;: true
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="38JCwCJjbjK0BpNeirV6hawmBtG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;FastAPI.question-bank.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #2.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #3.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Proyectos/PythonProject/question-bank&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Proyectos\PythonProject\question-bank\app" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="HttpClient.HttpRequestRunConfigurationType">
+          <value>
+            <map>
+              <entry key="generated-requests | #1" value="STOPPED" />
+              <entry key="generated-requests | #2" value="STOPPED" />
+              <entry key="generated-requests | #3" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="FastAPI.question-bank">
+    <configuration name="generated-requests | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#2" index="2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#3" index="3" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="question-bank" type="Python.FastAPI">
+      <option name="file" value="D:\Proyectos\PythonProject\question-bank\app\main.py" />
+      <module name="question-bank" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/Scripts/python.exe" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.generated-requests | #3" />
+        <item itemvalue="HTTP Request.generated-requests | #2" />
+        <item itemvalue="HTTP Request.generated-requests | #1" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.29346.308" />
+        <option value="bundled-python-sdk-ca5e2b39c7df-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.308" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1c8eefe2-e8d7-45a0-850d-0ea00e5cbcc2" name="Changes" comment="" />
+      <created>1768508532026</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768508532026</updated>
+      <workItem from="1768508534568" duration="2993000" />
+      <workItem from="1768527917337" duration="13180000" />
+      <workItem from="1768593014524" duration="459000" />
+      <workItem from="1768594274727" duration="2549000" />
+      <workItem from="1768625259226" duration="17173000" />
+      <workItem from="1768718170451" duration="18739000" />
+      <workItem from="1768738018948" duration="4114000" />
+      <workItem from="1768854131255" duration="821000" />
+      <workItem from="1768877657348" duration="14438000" />
+      <workItem from="1768935197079" duration="8859000" />
+      <workItem from="1768946787122" duration="1144000" />
+      <workItem from="1768954861476" duration="22000" />
+      <workItem from="1768954905937" duration="156000" />
+      <workItem from="1768955105911" duration="92000" />
+      <workItem from="1768955222330" duration="49000" />
+      <workItem from="1768955282601" duration="156000" />
+      <workItem from="1768955472456" duration="2145000" />
+      <workItem from="1768960353764" duration="8734000" />
+      <workItem from="1769007276641" duration="7627000" />
+      <workItem from="1769048069735" duration="12010000" />
+    </task>
+    <task id="LOCAL-00001" summary="add models">
+      <option name="closed" value="true" />
+      <created>1768554041109</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1768554041109</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add configuration settings for database connection">
+      <option name="closed" value="true" />
+      <created>1768554391598</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1768554391598</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add database connection setup and session management">
+      <option name="closed" value="true" />
+      <created>1768554449068</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1768554449068</updated>
+    </task>
+    <task id="LOCAL-00004" summary="add lifespan management">
+      <option name="closed" value="true" />
+      <created>1768554480929</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1768554480929</updated>
+    </task>
+    <task id="LOCAL-00005" summary="add base imports for models">
+      <option name="closed" value="true" />
+      <created>1768554493752</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1768554493752</updated>
+    </task>
+    <task id="LOCAL-00006" summary="add schemas for questions and choices">
+      <option name="closed" value="true" />
+      <created>1768719635669</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1768719635669</updated>
+    </task>
+    <task id="LOCAL-00007" summary="renamed files">
+      <option name="closed" value="true" />
+      <created>1768947460752</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947460752</updated>
+    </task>
+    <task id="LOCAL-00008" summary="deleted file difficulty.py">
+      <option name="closed" value="true" />
+      <created>1768947477206</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947477206</updated>
+    </task>
+    <task id="LOCAL-00009" summary="deleted difficulty_id">
+      <option name="closed" value="true" />
+      <created>1768947539112</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947539112</updated>
+    </task>
+    <task id="LOCAL-00010" summary="change base_imports.py">
+      <option name="closed" value="true" />
+      <created>1768947560797</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947560797</updated>
+    </task>
+    <task id="LOCAL-00011" summary="change the model and schema of choice">
+      <option name="closed" value="true" />
+      <created>1768947641698</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947641698</updated>
+    </task>
+    <task id="LOCAL-00012" summary="add router and crud of question">
+      <option name="closed" value="true" />
+      <created>1768947682126</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947682126</updated>
+    </task>
+    <task id="LOCAL-00013" summary="add crud of choice">
+      <option name="closed" value="true" />
+      <created>1768947693389</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947693389</updated>
+    </task>
+    <task id="LOCAL-00014" summary="add model of modality">
+      <option name="closed" value="true" />
+      <created>1768947706078</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947706078</updated>
+    </task>
+    <task id="LOCAL-00015" summary="add Optional in question_number and delete difficulty_id">
+      <option name="closed" value="true" />
+      <created>1768947821049</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947821049</updated>
+    </task>
+    <task id="LOCAL-00016" summary="add lifespan, base_imports and routers">
+      <option name="closed" value="true" />
+      <created>1768947882637</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947882637</updated>
+    </task>
+    <task id="LOCAL-00017" summary="modificated period.py and topic.py">
+      <option name="closed" value="true" />
+      <created>1768947918814</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1768947918814</updated>
+    </task>
+    <task id="LOCAL-00018" summary="code formatting">
+      <option name="closed" value="true" />
+      <created>1768961519228</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1768961519228</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Improve question schema and typing">
+      <option name="closed" value="true" />
+      <created>1768968535511</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1768968535511</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Update assessment and choice schemas">
+      <option name="closed" value="true" />
+      <created>1769007651566</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1769007651566</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refactor(question): simplify creation logic and cleanup hashing">
+      <option name="closed" value="true" />
+      <created>1769013238408</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1769013238408</updated>
+    </task>
+    <task id="LOCAL-00022" summary="add status 201 to the endpoint">
+      <option name="closed" value="true" />
+      <created>1769013303206</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1769013303206</updated>
+    </task>
+    <task id="LOCAL-00023" summary="feat(question): add unique choice validation and refactor creation logic">
+      <option name="closed" value="true" />
+      <created>1769014911455</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1769014911455</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add models" />
+    <MESSAGE value="add configuration settings for database connection" />
+    <MESSAGE value="add database connection setup and session management" />
+    <MESSAGE value="add lifespan management" />
+    <MESSAGE value="add base imports for models" />
+    <MESSAGE value="add schemas for questions and choices" />
+    <MESSAGE value="renamed files" />
+    <MESSAGE value="deleted file difficulty.py" />
+    <MESSAGE value="deleted difficulty_id" />
+    <MESSAGE value="change base_imports.py" />
+    <MESSAGE value="change the model and schema of choice" />
+    <MESSAGE value="add router and crud of question" />
+    <MESSAGE value="add crud of choice" />
+    <MESSAGE value="add model of modality" />
+    <MESSAGE value="add Optional in question_number and delete difficulty_id" />
+    <MESSAGE value="add lifespan, base_imports and routers" />
+    <MESSAGE value="modificated period.py and topic.py" />
+    <MESSAGE value="code formatting" />
+    <MESSAGE value="Improve question schema and typing" />
+    <MESSAGE value="Update assessment and choice schemas" />
+    <MESSAGE value="refactor(question): simplify creation logic and cleanup hashing" />
+    <MESSAGE value="add status 201 to the endpoint" />
+    <MESSAGE value="feat(question): add unique choice validation and refactor creation logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(question): add unique choice validation and refactor creation logic" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/question_bank$question_bank.coverage" NAME="question-bank Coverage Results" MODIFIED="1769011542842" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

@@ -8,18 +8,30 @@ from google.api_core.exceptions import (
 import logging
 import datetime
 from app.ports.storage_port import StoragePort
+from app.core.config import settings
 
 
 # https://docs.cloud.google.com/python/docs/reference/storage/latest
 class GCPStorageAdapter(StoragePort):
+    def __init__(self):
+        # DEV
+        if (
+            hasattr(settings, "GOOGLE_APPLICATION_CREDENTIALS")
+            and settings.GOOGLE_APPLICATION_CREDENTIALS
+        ):
+            self.storage_client = Client.from_service_account_json(
+                settings.GOOGLE_APPLICATION_CREDENTIALS
+            )
+        # PROD
+        else:
+            self.storage_client = Client()
 
     # https://docs.cloud.google.com/storage/docs/access-control/signing-urls-manually?hl=es-419
     def generate_signed_url(
         self, storage_container_name: str, storage_object_name: str
     ) -> str:
         try:
-            storage_client = Client()
-            bucket = storage_client.bucket(storage_container_name)
+            bucket = self.storage_client.bucket(storage_container_name)
             blob = bucket.blob(storage_object_name)
 
             if not blob.exists():
@@ -30,7 +42,7 @@ class GCPStorageAdapter(StoragePort):
             url = blob.generate_signed_url(
                 version="v4",
                 expiration=datetime.timedelta(minutes=15),
-                content_type="image/webp",
+                # content_type="image/webp",
                 method="GET",
             )
 
@@ -60,13 +72,12 @@ class GCPStorageAdapter(StoragePort):
         content_type: str | None = None,
     ):
         try:
-            storage_client = Client()
-            bucket = storage_client.bucket(storage_container_name)
+            bucket = self.storage_client.bucket(storage_container_name)
             blob = bucket.blob(destination)
 
             blob.upload_from_string(data, content_type=content_type)
 
-            return f"gs://{storage_container_name}/{destination}"
+            return destination[1:]
         except NotFound:
             logging.error("❌ El bucket '%s' no existe", storage_container_name)
             raise
