@@ -11,14 +11,6 @@ class ChoiceBase(BaseModel):
     content: Annotated[
         str, Field(description="Texto de la opción", examples=["Opción de ejemplo"])
     ]
-    image_url: Annotated[
-        str | None,
-        Field(
-            default=None,
-            description="URL de una imagen asociada a la opción (opcional)",
-            examples=["https://example.com/image.png"],
-        ),
-    ]
 
 
 class ChoiceCreate(ChoiceBase):
@@ -31,5 +23,6 @@ class ChoiceRead(ChoiceBase):
     id: int
     is_correct: bool
     question_id: int
+    image_path: str
 
     model_config = ConfigDict(from_attributes=True)

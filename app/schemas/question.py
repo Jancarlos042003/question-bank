@@ -1,9 +1,18 @@
 from enum import IntEnum
-from typing import Annotated, List, Literal
+from typing import Annotated, List
 
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 
 from app.schemas.choice import ChoiceCreate, ChoiceRead
+from app.schemas.solution import SolutionCreate, SolutionRead
+from app.schemas.statement import (
+    StatementCreate,
+    StatementRead,
+    StatementWithItemsCreate,
+    StatementWithoutItemsCreate,
+    MatchingStatementCreate,
+)
+from app.helpers.subject_code import SubjectCode
 
 
 class QuestionType(IntEnum):
@@ -14,112 +23,16 @@ class QuestionType(IntEnum):
     COMPLETION = 5
 
 
-class StatementItem(BaseModel):
-    id: Annotated[
-        str, Field(description="Identificador del ítem (I, II, III o A, B, C)")
-    ]
-    content: Annotated[str, Field(description="Contenido del ítem")]
-
-
-class StatementBase(BaseModel):
-    text: Annotated[str, Field(..., description="Enunciado principal de la pregunta")]
-    image_urls: Annotated[List[str] | None, Field(description="URLs de imágenes")] = (
-        None
-    )
-
-
-class StatementWithItems(StatementBase):
-    """
-    Enunciado usado por:
-    - True/False
-    - Ordering
-    """
-
-    type: Literal["standard_with_items"] = "standard_with_items"
-    items: Annotated[
-        List[StatementItem],
-        Field(
-            min_length=2,
-            max_length=5,
-            description="Lista de ítems asociados al enunciado",
-        ),
-    ]
-
-
-class StatementWithoutItems(StatementBase):
-    """
-    Enunciado usado por:
-    - Direct
-    - Completion
-    """
-
-    type: Literal["standard_without_items"] = "standard_without_items"
-
-
-class MatchingStatement(StatementBase):
-    """Pregunta de relacionar columnas"""
-
-    type: Literal["matching"] = "matching"
-    left_column: Annotated[
-        List[StatementItem],
-        Field(
-            max_length=5,
-            description="Columna izquierda con items",
-            examples=[
-                [
-                    {"id": "1", "content": "Mitocondria"},
-                    {"id": "2", "content": "Ribosoma"},
-                ]
-            ],
-        ),
-    ]
-    right_column: Annotated[
-        List[StatementItem],
-        Field(
-            max_length=5,
-            description="Columna derecha con items",
-            examples=[
-                [
-                    {"id": "A", "content": "Síntesis de proteínas"},
-                    {"id": "B", "content": "Producción de ATP"},
-                ]
-            ],
-        ),
-    ]
-
-    @model_validator(mode="after")
-    def validate_same_length(self):
-        if len(self.left_column) != len(self.right_column):
-            raise ValueError(
-                "Las columnas izquierda y derecha deben tener la misma cantidad de ítems"
-            )
-
-        return self
-
-
-# Union discriminada
-Statement = Annotated[
-    StatementWithItems | StatementWithoutItems | MatchingStatement,
-    Field(discriminator="type"),
-]
-
-
-class Solution(BaseModel):
-    explanation: Annotated[
-        str, Field(description="Explicación detallada de la solución")
-    ]
-    image_urls: List[str] | None = None
-
-
 class QuestionBase(BaseModel):
     topic_id: int
     assessment_id: int
     question_number: Annotated[int | None, Field(default=None, gt=0)]
-    statement: Statement
-    solution: Solution
 
 
 class QuestionCreate(QuestionBase):
+    subject: SubjectCode
+    solution: SolutionCreate
+    statement: StatementCreate
     question_type_id: Annotated[
         QuestionType,
         Field(
@@ -165,11 +78,11 @@ class QuestionCreate(QuestionBase):
 
         match type_id:
             case QuestionType.DIRECT | QuestionType.COMPLETION:
-                expected_type = StatementWithoutItems
+                expected_type = StatementWithoutItemsCreate
             case QuestionType.TRUE_FALSE | QuestionType.ORDERING:
-                expected_type = StatementWithItems
+                expected_type = StatementWithItemsCreate
             case QuestionType.MATCHING:
-                expected_type = MatchingStatement
+                expected_type = MatchingStatementCreate
             case _:
                 raise ValueError(f"Tipo de pregunta desconocido: {type_id}")
 
@@ -186,6 +99,8 @@ class QuestionRead(QuestionBase):
     id: int
     question_hash: str
     question_type_id: int
+    solution: SolutionRead
+    statement: StatementRead
     choices: List[ChoiceRead]
 
     model_config = ConfigDict(from_attributes=True)
