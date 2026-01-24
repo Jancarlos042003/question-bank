@@ -9,7 +9,12 @@ class ChoiceBase(BaseModel):
         Field(max_length=1, description="Etiqueta única de la opción", examples=["A"]),
     ]
     content: Annotated[
-        str, Field(description="Texto de la opción", examples=["Opción de ejemplo"])
+        str | None,
+        Field(
+            default=None,
+            description="Texto de la opción",
+            examples=["Opción de ejemplo"],
+        ),
     ]
 
 
@@ -23,6 +28,6 @@ class ChoiceRead(ChoiceBase):
     id: int
     is_correct: bool
     question_id: int
-    image_path: str
+    image_path: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
