@@ -12,10 +12,12 @@ from app.services.question_service import QuestionService
 
 question_router = APIRouter()
 
+
 # Dependency injection
-gcp_storage = GCPStorageAdapter()
-image_service = ImageService(storage=gcp_storage)
-question_service = QuestionService(image_service)
+def get_question_service() -> QuestionService:
+    gcp_storage = GCPStorageAdapter()
+    image_service = ImageService(storage=gcp_storage)
+    return QuestionService(image_service)
 
 
 @question_router.post(
@@ -24,14 +26,17 @@ question_service = QuestionService(image_service)
 async def add_question(
         payload: Annotated[str, Form(...)],
         db: Annotated[Session, Depends(get_db)],
+        service: Annotated[QuestionService, Depends(get_question_service)],
         statement_images: list[UploadFile] | None = File(None),
         choice_images: list[UploadFile] | None = File(None),
         solution_images: list[UploadFile] | None = File(None),
 ):
     """Endpoint para crear una nueva pregunta."""
+
+    #  Convertir el string JSON del formulario en un objeto de Pydantic.
     question = QuestionCreate.model_validate_json(payload)
 
-    return await question_service.create_question(
+    return await service.create_question(
         db=db,
         question=question,
         container_name=settings.CONTAINER_NAME,
@@ -42,6 +47,9 @@ async def add_question(
 
 
 @question_router.get("", response_model=list[QuestionRead])
-def all_questions(db: Annotated[Session, Depends(get_db)]):
+def all_questions(
+        db: Annotated[Session, Depends(get_db)],
+        service: Annotated[QuestionService, Depends(get_question_service)],
+):
     """Endpoint para obtener todas las preguntas."""
-    return question_service.get_all_questions(db)
+    return service.get_all_questions(db)
