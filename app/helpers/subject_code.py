@@ -1,5 +1,27 @@
 from enum import Enum
 
+_SUBJECT_LABELS = {
+    "HV": "habilidad-verbal",
+    "HM": "habilidad-matematica",
+    "AR": "aritmetica",
+    "AL": "algebra",
+    "GE": "geometria",
+    "TR": "trigonometria",
+    "LE": "lenguaje",
+    "LI": "literatura",
+    "PS": "psicologia",
+    "EC": "educacion-civica",
+    "HP": "historia-peru",
+    "HU": "historia-universal",
+    "GG": "geografia",
+    "EO": "economia",
+    "FI": "filosofia",
+    "FS": "fisica",
+    "QU": "quimica",
+    "BI": "biologia",
+}
+
+
 class SubjectCode(str, Enum):
     HV = "HV"
     HM = "HM"
@@ -20,28 +42,6 @@ class SubjectCode(str, Enum):
     QU = "QU"
     BI = "BI"
 
-    # Diccionario como atributo de clase para evitar recrearlo
-    _LABELS = {
-        "HV": "habilidad-verbal",
-        "HM": "habilidad-matemática",
-        "AR": "aritmetica",
-        "AL": "algebra",
-        "GE": "geometria",
-        "TR": "trigonometria",
-        "LE": "lenguaje",
-        "LI": "literatura",
-        "PS": "psicologia",
-        "EC": "educacion-civica",
-        "HP": "historia-peru",
-        "HU": "historia-universal",
-        "GG": "geografia",
-        "EO": "economia",
-        "FI": "filosofia",
-        "FS": "fisica",
-        "QU": "quimica",
-        "BI": "biologia",
-    }
-
     @property
     def label(self) -> str:
-        return self._LABELS[self.value]
+        return _SUBJECT_LABELS[self.value]
