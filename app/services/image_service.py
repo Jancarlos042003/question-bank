@@ -1,8 +1,8 @@
-import asyncio
+from typing import List
+
+from fastapi import UploadFile
 
 from app.ports.storage_port import StoragePort
-from fastapi import UploadFile
-from typing import List
 
 
 class ImageService:
@@ -12,7 +12,7 @@ class ImageService:
     # Falta manejar las excepciones. Crear excepciones personalizadas.
     async def upload_image(
         self, image: UploadFile, storage_container_name: str, destination: str
-    ):
+    ) -> str:
         image_bytes = await image.read()
 
         image_path = self.storage.upload_object_from_bytes(
@@ -26,7 +26,7 @@ class ImageService:
 
     async def upload_images(
         self, images: List[UploadFile], storage_container_name: str, destination: str
-    ):
+    ) -> list[str]:
         upload_images = []
 
         if not images:
@@ -44,7 +44,7 @@ class ImageService:
 
             upload_images.append(image_path)
 
-        return await asyncio.gather(*upload_images) # <-- OJO
+        return upload_images  # <-- OJO
 
     def generate_signature(self, storage_container_name: str, storage_object_name: str):
         url = self.storage.generate_signed_url(
