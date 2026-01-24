@@ -30,11 +30,34 @@ class QuestionService:
             choice_images: list[UploadFile] | None = File(None),
             solution_images: list[UploadFile] | None = File(None),
     ):
-        if choice_images and len(choice_images) != len(question.choices):
-            raise HTTPException(
-                status_code=400,
-                detail="El número de imágenes de choices debe coincidir con el número de choices",
-            )
+        # Validar contenido de choices según si hay imágenes o no
+        if choice_images:
+            # Si se pasan imágenes, validar que la cantidad coincida
+            if len(choice_images) != len(question.choices):
+                raise HTTPException(
+                    status_code=400,
+                    detail="El número de imágenes de choices debe coincidir con el número de choices",
+                )
+
+            # Validar que cada choice tenga contenido o imagen
+            for i, choice in enumerate(question.choices):
+                has_content = choice.content and choice.content.strip()
+                # Verificar que la imagen existe Y tiene contenido
+                has_image = choice_images[i] is not None and choice_images[i].size > 0
+
+                if not has_content and not has_image:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"El choice '{choice.label}' debe tener contenido de texto o una imagen",
+                    )
+        else:
+            # Si NO se pasan imágenes, validar que todos los choices tengan contenido
+            for choice in question.choices:
+                if not choice.content or not choice.content.strip():
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"El choice '{choice.label}' debe tener contenido de texto cuando no se proporciona imagen",
+                    )
 
         # SUBIR IMÁGENES
         course = question.subject.label
@@ -42,19 +65,19 @@ class QuestionService:
         statement_paths = await self.image_service.upload_images(
             images=statement_images,
             storage_container_name=container_name,
-            destination=f"/unmsm/courses/{course}/statements",
+            destination=f"unmsm/courses/{course}/statements",
         )
 
         choice_paths = await self.image_service.upload_images(
             images=choice_images,
             storage_container_name=container_name,
-            destination=f"/unmsm/courses/{course}/choices",
+            destination=f"unmsm/courses/{course}/choices",
         )
 
         solution_paths = await self.image_service.upload_images(
             images=solution_images,
             storage_container_name=container_name,
-            destination=f"/unmsm/courses/{course}/solutions",
+            destination=f"unmsm/courses/{course}/solutions",
         )
 
         # PREPARAR DATOS
@@ -104,8 +127,7 @@ class QuestionService:
         except SQLAlchemyError:
             db.rollback()
             raise HTTPException(
-                status_code=500,
-                detail="Error al crear la pregunta en la base de datos"
+                status_code=500, detail="Error al crear la pregunta en la base de datos"
             )
 
     def get_all_questions(self, db: Session):
