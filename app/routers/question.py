@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, UploadFile, File
+from fastapi import APIRouter, Depends, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -22,16 +22,18 @@ question_service = QuestionService(image_service)
     "", response_model=QuestionRead, status_code=status.HTTP_201_CREATED
 )
 async def add_question(
-        payload: QuestionCreate,
+        payload: Annotated[str, Form(...)],
         db: Annotated[Session, Depends(get_db)],
         statement_images: list[UploadFile] | None = File(None),
         choice_images: list[UploadFile] | None = File(None),
         solution_images: list[UploadFile] | None = File(None),
 ):
     """Endpoint para crear una nueva pregunta."""
+    question = QuestionCreate.model_validate_json(payload)
+
     return await question_service.create_question(
         db=db,
-        question=payload,
+        question=question,
         container_name=settings.CONTAINER_NAME,
         statement_images=statement_images,
         choice_images=choice_images,
