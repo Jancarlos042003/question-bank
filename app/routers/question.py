@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.dep import get_db
+from app.db.session import get_session
 from app.infrastructure.gcp.storage_adapter import GCPStorageAdapter
 from app.schemas.question import QuestionCreate, QuestionRead
 from app.services.image_service import ImageService
@@ -25,7 +25,7 @@ def get_question_service() -> QuestionService:
 )
 async def add_question(
         payload: Annotated[str, Form(...)],
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[Session, Depends(get_session)],
         service: Annotated[QuestionService, Depends(get_question_service)],
         statement_images: list[UploadFile] | None = File(None),
         choice_images: list[UploadFile] | None = File(None),
@@ -48,7 +48,7 @@ async def add_question(
 
 @question_router.get("", response_model=list[QuestionRead])
 def all_questions(
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[Session, Depends(get_session)],
         service: Annotated[QuestionService, Depends(get_question_service)],
 ):
     """Endpoint para obtener todas las preguntas."""
