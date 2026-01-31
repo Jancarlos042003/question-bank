@@ -7,7 +7,7 @@ from app.api.v1.assessment.repository import create_assessment, get_assessments
 from app.api.v1.assessment.schemas import AssessmentCreate, AssessmentRead
 from app.db.session import get_session
 
-assessment_router = APIRouter()
+assessment_router = APIRouter(tags=["Assessment"])
 
 
 @assessment_router.post(

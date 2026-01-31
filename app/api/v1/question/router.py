@@ -10,7 +10,7 @@ from app.infrastructure.gcp.storage_adapter import GCPStorageAdapter
 from app.services.image_service import ImageService
 from app.services.question_service import QuestionService
 
-question_router = APIRouter()
+question_router = APIRouter(tags=["Question"])
 
 
 # Dependency injection
