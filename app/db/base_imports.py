@@ -5,7 +5,7 @@ from app.models.assessment_type import AssessmentType
 from app.models.choice import Choice
 from app.models.course import Course
 from app.models.difficulty import Difficulty
-from app.models.modality import Mapped
+from app.models.modality import Modality
 from app.models.period import Period
 from app.models.question import Question
 from app.models.question_type import QuestionType
