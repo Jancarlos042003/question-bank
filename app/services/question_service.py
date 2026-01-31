@@ -1,16 +1,15 @@
 import hashlib
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.crud import choice_crud
-from app.crud import question_crud
+from app.crud import choice_crud, question_crud
 from app.schemas.question import (
-    StatementCreate,
-    QuestionCreate,
-    StatementWithItemsCreate,
     MatchingStatementCreate,
+    QuestionCreate,
+    StatementCreate,
+    StatementWithItemsCreate,
 )
 from app.services.image_service import ImageService
 

@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, model_validator
 from typing import Annotated, List, Literal
+
+from pydantic import BaseModel, Field, model_validator
 
 
 class StatementItem(BaseModel):

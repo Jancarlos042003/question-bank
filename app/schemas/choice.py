@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ChoiceBase(BaseModel):

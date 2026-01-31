@@ -1,18 +1,18 @@
 from enum import IntEnum
 from typing import Annotated, List
 
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.helpers.subject_code import SubjectCode
 from app.schemas.choice import ChoiceCreate, ChoiceRead
 from app.schemas.solution import SolutionCreate, SolutionRead
 from app.schemas.statement import (
+    MatchingStatementCreate,
     StatementCreate,
     StatementRead,
     StatementWithItemsCreate,
     StatementWithoutItemsCreate,
-    MatchingStatementCreate,
 )
-from app.helpers.subject_code import SubjectCode
 
 
 class QuestionType(IntEnum):
