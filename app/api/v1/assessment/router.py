@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.crud.assessment import create_assessment, get_assessments
+from app.api.v1.assessment.repository import create_assessment, get_assessments
+from app.api.v1.assessment.schemas import AssessmentCreate, AssessmentRead
 from app.db.session import get_session
-from app.schemas.assessment import AssessmentCreate, AssessmentRead
 
 assessment_router = APIRouter()
 

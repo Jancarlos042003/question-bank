@@ -3,16 +3,16 @@ from typing import Annotated, List
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.helpers.subject_code import SubjectCode
-from app.schemas.choice import ChoiceCreate, ChoiceRead
-from app.schemas.solution import SolutionCreate, SolutionRead
-from app.schemas.statement import (
+from app.api.v1.choice.schemas import ChoiceCreate, ChoiceRead
+from app.api.v1.solution.schemas import SolutionCreate, SolutionRead
+from app.api.v1.statement.schemas import (
     MatchingStatementCreate,
     StatementCreate,
     StatementRead,
     StatementWithItemsCreate,
     StatementWithoutItemsCreate,
 )
+from app.helpers.subject_code import SubjectCode
 
 
 class QuestionType(IntEnum):

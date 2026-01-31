@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.api.v1.question.schemas import QuestionCreate, QuestionRead
 from app.core.config import settings
 from app.db.session import get_session
 from app.infrastructure.gcp.storage_adapter import GCPStorageAdapter
-from app.schemas.question import QuestionCreate, QuestionRead
 from app.services.image_service import ImageService
 from app.services.question_service import QuestionService
 

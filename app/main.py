@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
+from app.api.v1.assessment.router import assessment_router
+from app.api.v1.question.router import question_router
 from app.core.middleware import register_middleware
-from app.routers.assessment import assessment_router
-from app.routers.question import question_router
 
 app = FastAPI()
 

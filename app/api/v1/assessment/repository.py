@@ -2,8 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.api.v1.assessment.schemas import AssessmentCreate
 from app.models.assessment import Assessment
-from app.schemas.assessment import AssessmentCreate
 
 
 def create_assessment(db: Session, assessment: AssessmentCreate):
