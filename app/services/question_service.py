@@ -4,8 +4,9 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.crud import choice_crud, question_crud
-from app.schemas.question import (
+from app.api.v1.choice.repository import create_choices_db
+from app.api.v1.question.repository import create_question_db, get_all_questions_db
+from app.api.v1.question.schemas import (
     MatchingStatementCreate,
     QuestionCreate,
     StatementCreate,
@@ -103,7 +104,7 @@ class QuestionService:
                 "question_type_id": question.question_type_id,
             }
 
-            new_question = question_crud.create_question_db(db, question_data)
+            new_question = create_question_db(db, question_data)
 
             # Crear choices
             choices_data = [
@@ -117,7 +118,7 @@ class QuestionService:
                 for i, choice in enumerate(question.choices)
             ]
 
-            choice_crud.create_choices_db(db, choices_data)
+            create_choices_db(db, choices_data)
 
             db.commit()
             db.refresh(new_question)
@@ -131,7 +132,7 @@ class QuestionService:
 
     def get_all_questions(self, db: Session):
         """Obtiene todas las preguntas."""
-        return question_crud.get_all_questions_db(db)
+        return get_all_questions_db(db)
 
     def _generate_question_hash(self, statement: StatementCreate) -> str:
         base = statement.text.strip().lower()
