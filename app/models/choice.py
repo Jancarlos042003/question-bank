@@ -1,8 +1,12 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Text, Boolean, ForeignKey
-from app.db.base import Base
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.question import Question
 
 class Choice(Base):
     __tablename__ = "choices"

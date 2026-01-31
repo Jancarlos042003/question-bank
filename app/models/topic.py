@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, ForeignKey
+
 from app.db.base import Base
 
+if TYPE_CHECKING:
+    from app.models.course import Course
 
 class Topic(Base):
     __tablename__ = "topics"

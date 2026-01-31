@@ -1,9 +1,15 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Integer, ForeignKey, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.area import Area
+    from app.models.assessment_type import AssessmentType
+    from app.models.modality import Modality
+    from app.models.period import Period
 
 
 class Assessment(Base):
