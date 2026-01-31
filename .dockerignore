@@ -1,0 +1,26 @@
+# 1. REDUCE EL TAMAÑO DE LA IMAGEN
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env -> SIEMPRE debe crearse dentro del contenedor, no copiarse.
+.venv/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# 2. SEGURIDAD
+# Environment variables
+.env
+.env.*
+
+# 3. DESARROLLO
+# IDE / Editor
+.vscode/
+.idea/
