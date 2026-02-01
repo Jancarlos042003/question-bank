@@ -100,6 +100,7 @@ class QuestionService:
                 "topic_id": question.topic_id,
                 "assessment_id": question.assessment_id,
                 "question_type_id": question.question_type_id,
+                "difficulty_id": question.difficulty_id
             }
 
             new_question = create_question_db(db, question_data)
