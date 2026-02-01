@@ -1,6 +1,6 @@
 import hashlib
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import File, HTTPException, UploadFile
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -13,8 +13,6 @@ from app.api.v1.question.schemas import (
     StatementWithItemsCreate,
 )
 from app.services.image_service import ImageService
-
-question_router = APIRouter()
 
 
 class QuestionService:

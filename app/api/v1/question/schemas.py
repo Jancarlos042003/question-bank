@@ -26,6 +26,7 @@ class QuestionType(IntEnum):
 class QuestionBase(BaseModel):
     topic_id: int
     assessment_id: int
+    difficulty_id: int
     question_number: Annotated[int | None, Field(default=None, gt=0)]
 
 
