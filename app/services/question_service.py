@@ -98,6 +98,7 @@ class QuestionService:
                 "statement": statement_data,
                 "solution": solution_data,
                 "topic_id": question.topic_id,
+                "subtopic_id": question.subtopic_id,
                 "assessment_id": question.assessment_id,
                 "question_type_id": question.question_type_id,
                 "difficulty_id": question.difficulty_id

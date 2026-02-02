@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.choice import Choice
     from app.models.difficulty import Difficulty
     from app.models.question_type import QuestionType
+    from app.models.subtopic import Subtopic
     from app.models.topic import Topic
 
 
@@ -23,11 +24,13 @@ class Question(Base):
     statement: Mapped[dict] = mapped_column(JSONB)
     solution: Mapped[dict] = mapped_column(JSONB)
     topic_id: Mapped[int] = mapped_column(ForeignKey("topics.id"), index=True)
+    subtopic_id: Mapped[int | None] = mapped_column(ForeignKey("subtopics.id"), index=True)
     assessment_id: Mapped[int] = mapped_column(ForeignKey("assessments.id"), index=True)
     question_type_id: Mapped[int] = mapped_column(ForeignKey("question_types.id"), index=True)
     difficulty_id: Mapped[int] = mapped_column(ForeignKey("difficulties.id"), index=True)
 
     topic: Mapped["Topic"] = relationship()
+    subtopic: Mapped["Subtopic"] = relationship()
     assessment: Mapped["Assessment"] = relationship()
     question_type: Mapped["QuestionType"] = relationship()
     difficulty: Mapped["Difficulty"] = relationship()
