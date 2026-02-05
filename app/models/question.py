@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.question_type import QuestionType
     from app.models.subtopic import Subtopic
     from app.models.choice_content import ChoiceContent
+    from app.models.solution import Solution
 
 
 class Question(Base):
@@ -37,3 +38,4 @@ class Question(Base):
     question_content: Mapped["ChoiceContent"] = relationship(
         back_populates="question", cascade="all, delete-orphan"
     )
+    solution: Mapped["Solution"] = relationship(back_populates="question", cascade="all, delete-orphan")
