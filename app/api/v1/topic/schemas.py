@@ -10,8 +10,13 @@ class TopicCreate(TopicBase):
     course_id: int
 
 
-class TopicRead(TopicBase):
+class TopicResponse(TopicBase):
     id: int
+
+
+class TopicSimpleResponse(BaseModel):
+    id: int
+    name: str
 
 
 class TopicUpdate(TopicBase):
