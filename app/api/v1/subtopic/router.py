@@ -4,27 +4,27 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.subtopic import repository
-from app.api.v1.subtopic.schemas import SubtopicCreate, SubtopicRead, SubtopicUpdate
+from app.api.v1.subtopic.schemas import SubtopicCreate, SubtopicResponse, SubtopicUpdate
 from app.db.session import get_session
 
 subtopic_router = APIRouter(tags=["Subtopic"])
 
 
 @subtopic_router.post(
-    "", response_model=SubtopicRead, status_code=status.HTTP_201_CREATED
+    "", response_model=SubtopicResponse, status_code=status.HTTP_201_CREATED
 )
 def add_subtopic(db: Annotated[Session, Depends(get_session)], subtopic: SubtopicCreate):
     return repository.create_subtopic(db, subtopic)
 
 
-@subtopic_router.get("", response_model=list[SubtopicRead])
+@subtopic_router.get("", response_model=list[SubtopicResponse])
 def read_subtopics(
-    db: Annotated[Session, Depends(get_session)], skip: int = 0, limit: int = 100
+        db: Annotated[Session, Depends(get_session)], skip: int = 0, limit: int = 100
 ):
     return repository.get_subtopics(db, skip, limit)
 
 
-@subtopic_router.get("/{subtopic_id}", response_model=SubtopicRead)
+@subtopic_router.get("/{subtopic_id}", response_model=SubtopicResponse)
 def read_subtopic(db: Annotated[Session, Depends(get_session)], subtopic_id: int):
     db_subtopic = repository.get_subtopic(db, subtopic_id)
     if db_subtopic is None:
@@ -32,11 +32,11 @@ def read_subtopic(db: Annotated[Session, Depends(get_session)], subtopic_id: int
     return db_subtopic
 
 
-@subtopic_router.patch("/{subtopic_id}", response_model=SubtopicRead)
+@subtopic_router.patch("/{subtopic_id}", response_model=SubtopicResponse)
 def update_subtopic(
-    db: Annotated[Session, Depends(get_session)],
-    subtopic_id: int,
-    subtopic: SubtopicUpdate,
+        db: Annotated[Session, Depends(get_session)],
+        subtopic_id: int,
+        subtopic: SubtopicUpdate,
 ):
     db_subtopic = repository.update_subtopic(db, subtopic_id, subtopic)
     if db_subtopic is None:
