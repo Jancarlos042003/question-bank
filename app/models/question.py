@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.difficulty import Difficulty
     from app.models.question_type import QuestionType
     from app.models.subtopic import Subtopic
+    from app.models.choice_content import ChoiceContent
 
 
 class Question(Base):
@@ -31,5 +32,8 @@ class Question(Base):
         secondary=question_areas, back_populates="questions"
     )
     choices: Mapped[List["Choice"]] = relationship(
+        back_populates="question", cascade="all, delete-orphan"
+    )
+    question_content: Mapped["ChoiceContent"] = relationship(
         back_populates="question", cascade="all, delete-orphan"
     )
