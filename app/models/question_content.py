@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -19,10 +19,10 @@ class QuestionContent(Base):
     __tablename__ = "question_content"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    label: Mapped[str | None] = mapped_column(String(1), nullable=False)
+    label: Mapped[str | None] = mapped_column(String(1))
     type: Mapped[ContentType] = mapped_column(String, nullable=False)
     value: Mapped[str] = mapped_column(String, nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
-    choice_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
 
     question: Mapped["Question"] = relationship(back_populates="question_content")

@@ -1,33 +1,34 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.v1.choice_content.schemas import (
+    ChoiceContentCreateInput,
+    ChoiceContentResponse,
+)
+
 
 class ChoiceBase(BaseModel):
-    label: Annotated[
-        str,
-        Field(max_length=1, description="Etiqueta única de la opción", examples=["A"]),
+    label: Annotated[str, Field(max_length=1, examples=["A, B, C, D, E"])]
+    is_correct: Annotated[
+        bool,
+        Field(description="Indica si la opción es correcta"),
     ]
-    content: Annotated[
-        str | None,
-        Field(
-            default=None,
-            description="Texto de la opción",
-            examples=["Opción de ejemplo"],
-        ),
+
+
+class ChoiceCreateInput(ChoiceBase):
+    contents: Annotated[
+        List[ChoiceContentCreateInput],
+        Field(min_length=1, description="Contenido de la opción"),
     ]
 
 
 class ChoiceCreate(ChoiceBase):
-    is_correct: Annotated[
-        bool, Field(description="Indica si la opción es correcta", examples=[True])
-    ]
-
-
-class ChoiceRead(ChoiceBase):
-    id: int
-    is_correct: bool
     question_id: int
-    image_path: str | None = None
+
+
+class ChoiceResponse(BaseModel):
+    is_correct: bool
+    contents: List[ChoiceContentResponse]
 
     model_config = ConfigDict(from_attributes=True)

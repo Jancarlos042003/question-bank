@@ -9,7 +9,6 @@ from app.models.difficulty import Difficulty
 from app.models.modality import Modality
 from app.models.period import Period
 from app.models.question import Question
-from app.models.question_areas import QuestionAreas
 from app.models.question_content import QuestionContent
 from app.models.question_type import QuestionType
 from app.models.solution import Solution

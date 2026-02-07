@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.api.v1.topic.schemas import TopicSimpleResponse
 
@@ -13,7 +13,10 @@ class SubtopicCreate(SubtopicBase):
 
 class SubtopicResponse(SubtopicBase):
     id: int
+    name: str
     topic: TopicSimpleResponse
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SubtopicUpdate(SubtopicBase):

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class TopicBase(BaseModel):
@@ -17,6 +17,8 @@ class TopicResponse(TopicBase):
 class TopicSimpleResponse(BaseModel):
     id: int
     name: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TopicUpdate(TopicBase):

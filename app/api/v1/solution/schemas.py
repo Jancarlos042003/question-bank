@@ -1,17 +1,25 @@
 from typing import Annotated, List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.api.v1.solution_content.shemas import (
+    SolutionContentCreateInput,
+    SolutionContentResponse,
+)
 
 
-class SolutionBase(BaseModel):
-    explanation: Annotated[
-        str, Field(description="Explicación detallada de la solución")
+class SolutionCreateInput(BaseModel):
+    contents: Annotated[
+        List[SolutionContentCreateInput], Field(description="Contenido de la solución")
     ]
 
 
-class SolutionCreate(SolutionBase):
-    pass
+class SolutionCreate(BaseModel):
+    question_id: int
 
 
-class SolutionRead(SolutionBase):
-    image_paths: List[str] | None = None
+class SolutionResponse(BaseModel):
+    id: int
+    contents: List[SolutionContentResponse]
+
+    model_config = ConfigDict(from_attributes=True)

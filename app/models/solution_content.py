@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -24,4 +24,4 @@ class SolutionContent(Base):
     order: Mapped[int] = mapped_column(Integer, nullable=False)
     solution_id: Mapped[int] = mapped_column(ForeignKey("solutions.id"))
 
-    solution: Mapped["Solution"] = relationship(back_populates="solution_content")
+    solution: Mapped["Solution"] = relationship(back_populates="contents")

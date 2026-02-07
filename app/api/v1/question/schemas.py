@@ -1,17 +1,19 @@
 from enum import IntEnum
 from typing import Annotated, List
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.api.v1.choice.schemas import ChoiceCreate, ChoiceRead
-from app.api.v1.solution.schemas import SolutionCreate, SolutionRead
-from app.api.v1.statement.schemas import (
-    MatchingStatementCreate,
-    StatementCreate,
-    StatementRead,
-    StatementWithItemsCreate,
-    StatementWithoutItemsCreate,
+from app.api.v1.area.schemas import AreaResponse
+from app.api.v1.choice.schemas import ChoiceCreateInput, ChoiceResponse
+from app.api.v1.difficulty.schemas import DifficultyResponse
+from app.api.v1.question_content.schemas import (
+    QuestionContentCreateInput,
+    QuestionContentResponse,
 )
+from app.api.v1.question_type.schemas import QuestionTypeRead
+from app.api.v1.solution.schemas import SolutionCreateInput, SolutionResponse
+from app.api.v1.solution_content.shemas import SolutionContentResponse
+from app.api.v1.subtopic.schemas import SubtopicResponse
 from app.helpers.subject_code import SubjectCode
 
 
@@ -24,30 +26,52 @@ class QuestionType(IntEnum):
 
 
 class QuestionBase(BaseModel):
-    topic_id: int
-    subtopic_id: int
-    assessment_id: int
-    difficulty_id: int
-    question_number: Annotated[int | None, Field(default=None, gt=0)]
-
-
-class QuestionCreate(QuestionBase):
-    subject: SubjectCode
-    solution: SolutionCreate
-    statement: StatementCreate
     question_type_id: Annotated[
         QuestionType,
         Field(
-            description="Tipo de pregunta (1=Directa, 2=Verdadero/Falso, 3=Relacionar, 4=Ordenamiento, 5=Completación"
+            description="Tipo de pregunta",
+            examples=[
+                "1=Directa",
+                "2=Verdadero/Falso",
+                "3=Relacionar",
+                "4=Ordenamiento",
+                "5=Completación",
+            ],
         ),
     ]
+    subtopic_id: int
+    difficulty_id: int
+
+
+class QuestionCreate(QuestionBase):
+    question_hash: Annotated[str, Field(description="Hash de la pregunta")]
+
+
+class QuestionCreateInput(QuestionBase):
+    area_ids: Annotated[
+        List[int],
+        Field(
+            min_length=1,
+            description="Lista de IDs de áreas válidas",
+            examples=["1=A", "2=B", "3=C", "4=D", "5=E"],
+            default_factory=list,
+        ),
+    ]
+    # subject: SubjectCode OJO: VER SI ES NECESARIO para almacenar las imágenes
+    contents: Annotated[
+        List[QuestionContentCreateInput],
+        Field(description="Contenido de la pregunta", default_factory=list),
+    ]
+    solution: Annotated[
+        SolutionCreateInput, Field(description="Solución de la pregunta")
+    ]
     choices: Annotated[
-        List[ChoiceCreate], Field(min_length=4, max_length=5, default_factory=list)
+        List[ChoiceCreateInput], Field(min_length=4, max_length=5, default_factory=list)
     ]
 
     @field_validator("choices")
     @classmethod
-    def validate_single_correct(cls, choices: List[ChoiceCreate]):
+    def validate_single_correct(cls, choices: List[ChoiceCreateInput]):
         """Valida que exista exactamente una alternativa marcada como correcta (true)."""
         correct = sum(1 for c in choices if c.is_correct)
 
@@ -58,51 +82,41 @@ class QuestionCreate(QuestionBase):
 
     @field_validator("choices")
     @classmethod
-    def validate_unique_responses(cls, choices: List[ChoiceCreate]):
+    def validate_unique_responses(cls, choices: List[ChoiceCreateInput]):
         """Valida que el contenido de las alternativas sea único."""
         unique_choices = set()
 
         for c in choices:
-            normalized = c.content.strip().lower()
+            for content in c.contents:
+                normalized = content.value.strip().lower()
 
-            if normalized in unique_choices:
-                raise ValueError("Las repuestas deben ser únicas")
+                if normalized in unique_choices:
+                    raise ValueError("Las respuestas deben ser únicas")
 
-            unique_choices.add(normalized)
+                unique_choices.add(normalized)
 
         return choices
 
-    @model_validator(mode="after")
-    def validate_statement_type_consistency(self):
-        """Valida que el tipo de statement coincida con `type_question_id`"""
-        statement = self.statement
-        type_id = self.question_type_id
 
-        match type_id:
-            case QuestionType.DIRECT | QuestionType.COMPLETION:
-                expected_type = StatementWithoutItemsCreate
-            case QuestionType.TRUE_FALSE | QuestionType.ORDERING:
-                expected_type = StatementWithItemsCreate
-            case QuestionType.MATCHING:
-                expected_type = MatchingStatementCreate
-            case _:
-                raise ValueError(f"Tipo de pregunta desconocido: {type_id}")
+# Para estudio / banco
+class QuestionStudyResponse(BaseModel):
+    id: int
+    question_hash: Annotated[str, Field(description="Hash de la pregunta")]
+    question_type: QuestionTypeRead
+    subtopic: SubtopicResponse
+    difficulty: DifficultyResponse
+    areas: List[AreaResponse]
+    choices: List[ChoiceResponse]
+    solution: SolutionResponse
 
-        if not isinstance(statement, expected_type):
-            raise ValueError(
-                f"Las preguntas de tipo {type_id.name} deben usar "
-                f"{expected_type.__name__}, pero se recibió {type(statement).__name__}"
-            )
-
-        return self
+    model_config = ConfigDict(from_attributes=True)
 
 
-class QuestionRead(QuestionBase):
+# Para simulacros exámenes
+class QuestionSolveResponse(BaseModel):
     id: int
     question_hash: str
-    question_type_id: int
-    solution: SolutionRead
-    statement: StatementRead
-    choices: List[ChoiceRead]
+    contents: List[QuestionContentResponse]
+    choices: List[ChoiceResponse]
 
     model_config = ConfigDict(from_attributes=True)
