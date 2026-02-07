@@ -34,13 +34,13 @@ class Question(Base):
     difficulty: Mapped["Difficulty"] = relationship()
 
     areas: Mapped[list["Area"]] = relationship(
-        secondary=question_areas, back_populates="questions"
+        secondary=question_areas, back_populates="questions", lazy="selectin"
     )
     choices: Mapped[list["Choice"]] = relationship(
-        back_populates="question", cascade="all, delete-orphan"
+        back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
     question_content: Mapped["QuestionContent"] = relationship(
-        back_populates="question", cascade="all, delete-orphan"
+        back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
     solution: Mapped["Solution"] = relationship(
         back_populates="question", cascade="all"

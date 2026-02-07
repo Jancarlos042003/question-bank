@@ -13,6 +13,6 @@ class Solution(Base):
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
 
     contents: Mapped[list["SolutionContent"]] = relationship(
-        back_populates="solution", cascade="all, delete-orphan"
+        back_populates="solution", cascade="all, delete-orphan", lazy="selectin"
     )
     question: Mapped["Question"] = relationship(back_populates="solution")
