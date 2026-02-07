@@ -21,6 +21,10 @@ class SubtopicCreate(SubtopicBase):
     ]
 
 
+class SubtopicUpdate(SubtopicBase):
+    pass
+
+
 # PUBLIC
 class SubtopicPublic(SubtopicBase):
     name: Annotated[
@@ -32,7 +36,3 @@ class SubtopicPublic(SubtopicBase):
     ]
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class SubtopicUpdate(SubtopicBase):
-    pass
