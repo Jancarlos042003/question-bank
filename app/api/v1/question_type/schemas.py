@@ -1,5 +1,6 @@
+from typing import Annotated
+
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.sql.annotation import Annotated
 
 
 class QuestionTypeBase(BaseModel):
