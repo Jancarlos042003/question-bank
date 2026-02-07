@@ -1,20 +1,35 @@
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated
 
-from app.api.v1.topic.schemas import TopicSimpleResponse
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SubtopicBase(BaseModel):
-    name: str
+    name: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Nombre del subtema",
+            examples=["La Biología y la materia viviente"],
+        ),
+    ]
 
 
+# PRIVADO
 class SubtopicCreate(SubtopicBase):
-    topic_id: int
+    topic_id: Annotated[
+        int, Field(gt=0, description="ID del tema al que pertenece", examples=[1])
+    ]
 
 
-class SubtopicResponse(SubtopicBase):
-    id: int
-    name: str
-    topic: TopicSimpleResponse
+# PUBLIC
+class SubtopicPublic(SubtopicBase):
+    name: Annotated[
+        str,
+        Field(
+            description="Nombre del subtema",
+            examples=["La Biología y la materia viviente"],
+        ),
+    ]
 
     model_config = ConfigDict(from_attributes=True)
 
