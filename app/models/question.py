@@ -39,7 +39,7 @@ class Question(Base):
     choices: Mapped[list["Choice"]] = relationship(
         back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
-    question_content: Mapped["QuestionContent"] = relationship(
+    contents: Mapped["QuestionContent"] = relationship(
         back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
     solution: Mapped["Solution"] = relationship(

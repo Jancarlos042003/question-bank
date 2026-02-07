@@ -25,4 +25,4 @@ class QuestionContent(Base):
     order: Mapped[int] = mapped_column(Integer, nullable=False)
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
 
-    question: Mapped["Question"] = relationship(back_populates="question_content")
+    question: Mapped["Question"] = relationship(back_populates="contents")
