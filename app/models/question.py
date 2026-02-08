@@ -37,11 +37,17 @@ class Question(Base):
         secondary=question_areas, back_populates="questions", lazy="selectin"
     )
     choices: Mapped[list["Choice"]] = relationship(
-        back_populates="question", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="question",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="Choice.label",
     )
-    contents: Mapped["QuestionContent"] = relationship(
-        back_populates="question", cascade="all, delete-orphan", lazy="selectin"
+    contents: Mapped[list["QuestionContent"]] = relationship(
+        back_populates="question",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="QuestionContent.order",
     )
     solution: Mapped["Solution"] = relationship(
-        back_populates="question", cascade="all"
+        back_populates="question", cascade="all", uselist=False
     )

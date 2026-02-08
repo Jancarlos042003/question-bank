@@ -20,5 +20,8 @@ class Choice(Base):
 
     question: Mapped["Question"] = relationship(back_populates="choices")
     contents: Mapped[list["ChoiceContent"]] = relationship(
-        back_populates="choice", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="choice",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="ChoiceContent.order",
     )
