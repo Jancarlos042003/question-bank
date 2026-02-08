@@ -27,6 +27,7 @@ class SolutionContentBase(BaseModel):
     order: Annotated[int, Field(description="Orden de aparición", ge=1, examples=[1])]
 
 
+# PRIVADO
 class SolutionContentCreateInput(SolutionContentBase):
     pass
 
@@ -35,11 +36,12 @@ class SolutionContentCreate(SolutionContentBase):
     solution_id: int
 
 
-class SolutionContentResponse(SolutionContentBase):
+class SolutionContentRespo(SolutionContentBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class SolutionContentSimpleResponse(SolutionContentBase):
+# PÚBLICO
+class SolutionContentPublic(SolutionContentBase):
     model_config = ConfigDict(from_attributes=True)

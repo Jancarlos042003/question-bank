@@ -4,10 +4,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.v1.solution_content.shemas import (
     SolutionContentCreateInput,
-    SolutionContentResponse,
+    SolutionContentPublic,
 )
 
 
+# PRIVADO
 class SolutionCreateInput(BaseModel):
     contents: Annotated[
         List[SolutionContentCreateInput], Field(description="Contenido de la solución")
@@ -20,6 +21,13 @@ class SolutionCreate(BaseModel):
 
 class SolutionResponse(BaseModel):
     id: int
-    contents: List[SolutionContentResponse]
+    contents: List[SolutionContentPublic]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# PÚBLICO
+class SolutionPublic(BaseModel):
+    contents: List[SolutionContentPublic]
 
     model_config = ConfigDict(from_attributes=True)

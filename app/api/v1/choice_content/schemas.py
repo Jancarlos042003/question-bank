@@ -27,6 +27,7 @@ class ChoiceContentBase(BaseModel):
     order: Annotated[int, Field(description="Orden de aparición", ge=1, examples=[1])]
 
 
+# PRIVADO
 class ChoiceContentCreateInput(ChoiceContentBase):
     pass
 
@@ -38,4 +39,9 @@ class ChoiceContentCreate(ChoiceContentBase):
 class ChoiceContentResponse(ChoiceContentBase):
     id: int
 
+    model_config = ConfigDict(from_attributes=True)
+
+
+# PÚBLICO
+class ChoiceContentPublic(ChoiceContentBase):
     model_config = ConfigDict(from_attributes=True)

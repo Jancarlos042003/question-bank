@@ -4,18 +4,26 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.v1.choice_content.schemas import (
     ChoiceContentCreateInput,
-    ChoiceContentResponse,
+    ChoiceContentPublic,
 )
 
 
 class ChoiceBase(BaseModel):
-    label: Annotated[str, Field(max_length=1, examples=["A, B, C, D, E"])]
+    label: Annotated[
+        str,
+        Field(
+            max_length=1,
+            description="Etiqueta de la opción",
+            examples=["A, B, C, D, E"],
+        ),
+    ]
     is_correct: Annotated[
         bool,
         Field(description="Indica si la opción es correcta"),
     ]
 
 
+# PRIVADO
 class ChoiceCreateInput(ChoiceBase):
     contents: Annotated[
         List[ChoiceContentCreateInput],
@@ -27,8 +35,12 @@ class ChoiceCreate(ChoiceBase):
     question_id: int
 
 
-class ChoiceResponse(BaseModel):
+# PÚBLICO
+class ChoicePublic(BaseModel):
     is_correct: bool
-    contents: List[ChoiceContentResponse]
+    label: Annotated[
+        str, Field(description="Etiqueta de la opción", examples=["A, B, C, D, E"])
+    ]
+    contents: List[ChoiceContentPublic]
 
     model_config = ConfigDict(from_attributes=True)

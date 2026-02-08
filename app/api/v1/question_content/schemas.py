@@ -39,7 +39,7 @@ class QuestionContentCreate(QuestionContentBase):
     question_id: Annotated[int, Field(examples=[10])]
 
 
-class QuestionContentResponse(BaseModel):
-    pass
+class QuestionContentResponse(QuestionContentBase):
+    id: Annotated[int, Field(gt=0, examples=[1])]
 
     model_config = ConfigDict(from_attributes=True)

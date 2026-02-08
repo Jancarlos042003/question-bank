@@ -3,18 +3,15 @@ from typing import Annotated, List
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.api.v1.area.schemas import AreaResponse
-from app.api.v1.choice.schemas import ChoiceCreateInput, ChoiceResponse
-from app.api.v1.difficulty.schemas import DifficultyResponse
+from app.api.v1.choice.schemas import ChoiceCreateInput, ChoicePublic
+from app.api.v1.difficulty.schemas import DifficultyPublic
 from app.api.v1.question_content.schemas import (
     QuestionContentCreateInput,
     QuestionContentResponse,
 )
-from app.api.v1.question_type.schemas import QuestionTypeRead
-from app.api.v1.solution.schemas import SolutionCreateInput, SolutionResponse
-from app.api.v1.solution_content.shemas import SolutionContentResponse
-from app.api.v1.subtopic.schemas import SubtopicResponse
-from app.helpers.subject_code import SubjectCode
+from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
+from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
+from app.api.v1.subtopic.schemas import SubtopicPublic
 
 
 class QuestionType(IntEnum):
@@ -43,6 +40,7 @@ class QuestionBase(BaseModel):
     difficulty_id: int
 
 
+# PRIVADO
 class QuestionCreate(QuestionBase):
     question_hash: Annotated[str, Field(description="Hash de la pregunta")]
 
@@ -98,18 +96,41 @@ class QuestionCreateInput(QuestionBase):
         return choices
 
 
+# PÚBLICO
 # Para estudio / banco
 class QuestionStudyResponse(BaseModel):
     id: int
-    question_hash: Annotated[str, Field(description="Hash de la pregunta")]
-    question_type: QuestionTypeRead
-    subtopic: SubtopicResponse
-    difficulty: DifficultyResponse
-    areas: List[AreaResponse]
-    choices: List[ChoiceResponse]
-    solution: SolutionResponse
+    # question_hash: Annotated[str, Field(description="Hash de la pregunta")]
+    question_type: QuestionTypeCodeOnly
+    subtopic: SubtopicPublic
+    difficulty: DifficultyPublic
+    areas: list[str]
+    contents: list[QuestionContentResponse]
+    choices: list[ChoicePublic]
+    solution: SolutionPublic
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("areas", mode="before")
+    @classmethod
+    def flatten_areas(cls, v):
+        """
+        Su función principal es aplanar y normalizar la lista de áreas (list[Area ORM])
+        asociadas a una pregunta y devolver list[str] (ej. ["A", "B", "C"]).
+        """
+        if v is None:
+            return []
+
+        out: list[str] = []
+        for item in v:
+            # Verificar si el atributo 'code' existe
+            if hasattr(item, "code"):
+                out.append(item.code)
+                continue
+
+            # fallback
+            out.append(str(item))
+        return out
 
 
 # Para simulacros exámenes
@@ -117,6 +138,6 @@ class QuestionSolveResponse(BaseModel):
     id: int
     question_hash: str
     contents: List[QuestionContentResponse]
-    choices: List[ChoiceResponse]
+    choices: List[ChoicePublic]
 
     model_config = ConfigDict(from_attributes=True)
