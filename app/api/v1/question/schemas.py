@@ -100,7 +100,6 @@ class QuestionCreateInput(QuestionBase):
 # Para estudio / banco
 class QuestionStudyResponse(BaseModel):
     id: int
-    # question_hash: Annotated[str, Field(description="Hash de la pregunta")]
     question_type: QuestionTypeCodeOnly
     subtopic: SubtopicPublic
     difficulty: DifficultyPublic
@@ -131,6 +130,36 @@ class QuestionStudyResponse(BaseModel):
             # fallback
             out.append(str(item))
         return out
+
+
+class QuestionSimpleStudyResponse(BaseModel):
+    id: int
+    contents: list[QuestionContentResponse]
+    difficulty: DifficultyPublic
+    subtopic: SubtopicPublic
+    choices: list[ChoicePublic]
+    solution: SolutionPublic
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class QuestionPaginatedResponse(BaseModel):
+    total_count: Annotated[int, Field(description="Total de preguntas")]
+    total_pages: Annotated[int, Field(description="Número de páginas")]
+    current_page: Annotated[int, Field(description="Página actual")]
+    items_count: Annotated[
+        int, Field(description="Total de preguntas de la página actual")
+    ]
+    has_prev: Annotated[bool, Field(description="Indica si existe una página anterior")]
+    has_next: Annotated[
+        bool, Field(description="Indica si existe una página siguiente")
+    ]
+    items: Annotated[
+        list[QuestionSimpleStudyResponse],
+        Field(description="Lista de preguntas de la página actual"),
+    ]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Para simulacros exámenes

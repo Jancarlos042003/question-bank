@@ -25,3 +25,5 @@ class DifficultyResponse(DifficultyBase):
 # PÚBLICO
 class DifficultyPublic(DifficultyBase):
     pass
+
+    model_config = ConfigDict(from_attributes=True)

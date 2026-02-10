@@ -14,7 +14,7 @@ class ChoiceBase(BaseModel):
         Field(
             max_length=1,
             description="Etiqueta de la opción",
-            examples=["A, B, C, D, E"],
+            examples=["A"],
         ),
     ]
     is_correct: Annotated[
@@ -38,9 +38,7 @@ class ChoiceCreate(ChoiceBase):
 # PÚBLICO
 class ChoicePublic(BaseModel):
     is_correct: bool
-    label: Annotated[
-        str, Field(description="Etiqueta de la opción", examples=["A, B, C, D, E"])
-    ]
+    label: Annotated[str, Field(description="Etiqueta de la opción", examples=["A"])]
     contents: List[ChoiceContentPublic]
 
     model_config = ConfigDict(from_attributes=True)

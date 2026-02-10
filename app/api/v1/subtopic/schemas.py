@@ -26,7 +26,7 @@ class SubtopicUpdate(SubtopicBase):
 
 
 # PUBLIC
-class SubtopicPublic(SubtopicBase):
+class SubtopicPublic(BaseModel):
     name: Annotated[
         str,
         Field(
