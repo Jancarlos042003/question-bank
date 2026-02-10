@@ -1,7 +1,5 @@
 # ruff: noqa: F401
 from app.models.area import Area
-from app.models.assessment import Assessment
-from app.models.assessment_type import AssessmentType
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.course import Course
