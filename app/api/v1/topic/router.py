@@ -1,47 +1,57 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.v1.topic import repository
+from app.api.v1.topic.repository import TopicRepository
 from app.api.v1.topic.schemas import TopicCreate, TopicResponse, TopicUpdate
 from app.db.session import get_session
+from app.services.topic_service import TopicService
 
 topic_router = APIRouter(tags=["Topic"])
 
 
-@topic_router.post("", response_model=TopicResponse, status_code=status.HTTP_201_CREATED)
-def add_topic(db: Annotated[Session, Depends(get_session)], topic: TopicCreate):
-    return repository.create_topic(db, topic)
+def get_topic_service(db: Annotated[Session, Depends(get_session)]):
+    repository = TopicRepository(db)
+    return TopicService(repository)
+
+
+@topic_router.post(
+    "", response_model=TopicResponse, status_code=status.HTTP_201_CREATED
+)
+def add_topic(
+    service: Annotated[TopicService, Depends(get_topic_service)], topic: TopicCreate
+):
+    return service.create_topic(topic)
 
 
 @topic_router.get("", response_model=list[TopicResponse])
 def read_topics(
-        db: Annotated[Session, Depends(get_session)], skip: int = 0, limit: int = 100
+    service: Annotated[TopicService, Depends(get_topic_service)],
+    skip: int = 0,
+    limit: int = 100,
 ):
-    return repository.get_topics(db, skip, limit)
+    return service.get_topics(skip, limit)
 
 
 @topic_router.get("/{topic_id}", response_model=TopicResponse)
-def read_topic(db: Annotated[Session, Depends(get_session)], topic_id: int):
-    db_topic = repository.get_topic(db, topic_id)
-    if db_topic is None:
-        raise HTTPException(status_code=404, detail="Tema de encontrado")
-    return db_topic
+def read_topic(
+    service: Annotated[TopicService, Depends(get_topic_service)], topic_id: int
+):
+    return service.get_topic(topic_id)
 
 
 @topic_router.patch("/{topic_id}", response_model=TopicResponse)
 def update_topic(
-        db: Annotated[Session, Depends(get_session)], topic_id: int, topic: TopicUpdate
+    service: Annotated[TopicService, Depends(get_topic_service)],
+    topic_id: int,
+    topic: TopicUpdate,
 ):
-    db_topic = repository.update_topic(db, topic_id, topic)
-    if db_topic is None:
-        raise HTTPException(status_code=404, detail="Tema de encontrado")
-    return db_topic
+    return service.update_topic(topic_id, topic)
 
 
 @topic_router.delete("/{topic_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_topic(db: Annotated[Session, Depends(get_session)], topic_id: int):
-    db_topic = repository.delete_topic(db, topic_id)
-    if db_topic is None:
-        raise HTTPException(status_code=404, detail="Tema de encontrado")
+def delete_topic(
+    service: Annotated[TopicService, Depends(get_topic_service)], topic_id: int
+):
+    return service.delete_topic(topic_id)
