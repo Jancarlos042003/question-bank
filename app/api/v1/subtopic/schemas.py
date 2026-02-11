@@ -2,6 +2,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.v1.topic.schemas import TopicPublic
+
 
 class SubtopicBase(BaseModel):
     name: Annotated[
@@ -21,11 +23,34 @@ class SubtopicCreate(SubtopicBase):
     ]
 
 
-class SubtopicUpdate(SubtopicBase):
-    pass
+class SubtopicUpdate(BaseModel):
+    name: Annotated[
+        str | None,
+        Field(
+            min_length=1,
+            description="Nombre del subtema",
+            examples=["La Biología y la materia viviente"],
+        ),
+    ] = None
+    topic_id: Annotated[
+        int | None,
+        Field(gt=0, description="ID del tema al que pertenece", examples=[1]),
+    ] = None
 
 
 # PUBLIC
+class SubtopicSimplePublic(BaseModel):
+    name: Annotated[
+        str,
+        Field(
+            description="Nombre del subtema",
+            examples=["La Biología y la materia viviente"],
+        ),
+    ]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class SubtopicPublic(BaseModel):
     name: Annotated[
         str,
@@ -33,6 +58,28 @@ class SubtopicPublic(BaseModel):
             description="Nombre del subtema",
             examples=["La Biología y la materia viviente"],
         ),
+    ]
+    topic: Annotated[
+        TopicPublic, Field(description="Tema al que pertenece", examples=["La célula"])
+    ]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SubtopicPaginatedResponse(BaseModel):
+    total_count: Annotated[int, Field(description="Total de subtemas")]
+    total_pages: Annotated[int, Field(description="Número de páginas")]
+    current_page: Annotated[int, Field(description="Página actual")]
+    items_count: Annotated[
+        int, Field(description="Total de subtemas de la página actual")
+    ]
+    has_prev: Annotated[bool, Field(description="Indica si existe una página anterior")]
+    has_next: Annotated[
+        bool, Field(description="Indica si existe una página siguiente")
+    ]
+    items: Annotated[
+        list[SubtopicPublic],
+        Field(description="Lista de preguntas de la página actual"),
     ]
 
     model_config = ConfigDict(from_attributes=True)
