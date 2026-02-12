@@ -8,9 +8,7 @@ from app.api.v1.course.schemas import CoursePublic, CourseResponse
 class TopicBase(BaseModel):
     name: Annotated[
         str,
-        Field(
-            min_length=1, description="Nombre del tema", examples=["Nombre del tema"]
-        ),
+        Field(min_length=1, description="Nombre del tema", examples=["La Célula"]),
     ]
     description: Annotated[
         str,
@@ -29,13 +27,6 @@ class TopicCreate(TopicBase):
     ]
 
 
-class TopicResponse(TopicBase):
-    id: int
-    course: Annotated[CourseResponse, Field(description="Curso al que pertenece")]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 class TopicUpdate(BaseModel):
     name: Annotated[
         str | None,
@@ -43,7 +34,7 @@ class TopicUpdate(BaseModel):
             default=None,
             min_length=1,
             description="Nombre del tema",
-            examples=["Nombre del tema"],
+            examples=["La Célula"],
         ),
     ]
     description: Annotated[
@@ -69,13 +60,21 @@ class TopicPublic(TopicBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class TopicSimplePublic(BaseModel):
+    id: Annotated[int, Field(description="ID del tema", examples=[1])]
+    name: Annotated[
+        str,
+        Field(min_length=1, description="Nombre del tema", examples=["La Célula"]),
+    ]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class TopicPublicNoDescription(BaseModel):
     id: Annotated[int, Field(description="ID del tema", examples=[1])]
     name: Annotated[
         str,
-        Field(
-            min_length=1, description="Nombre del tema", examples=["Nombre del tema"]
-        ),
+        Field(min_length=1, description="Nombre del tema", examples=["La Célula"]),
     ]
     course: Annotated[CoursePublic, Field(description="Curso al que pertenece")]
 

@@ -10,7 +10,6 @@ from app.api.v1.topic.schemas import (
     TopicPaginatedResponse,
     TopicPublic,
     TopicPublicNoDescription,
-    TopicResponse,
     TopicUpdate,
 )
 from app.db.session import get_session
@@ -28,7 +27,7 @@ def get_topic_service(db: Annotated[Session, Depends(get_session)]):
 
 @topic_router.post(
     "",
-    response_model=TopicResponse,
+    response_model=TopicPublic,
     status_code=status.HTTP_201_CREATED,
     summary="Crea un nuevo tema",
 )
@@ -68,7 +67,7 @@ def read_topic(
 
 
 @topic_router.patch(
-    "/{topic_id}", response_model=TopicResponse, summary="Actualizar un tema"
+    "/{topic_id}", response_model=TopicPublic, summary="Actualizar un tema"
 )
 def update_topic(
     service: Annotated[TopicService, Depends(get_topic_service)],
