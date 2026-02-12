@@ -63,12 +63,14 @@ class TopicUpdate(BaseModel):
 
 # PÚBLICO
 class TopicPublic(TopicBase):
+    id: Annotated[int, Field(description="ID del tema", examples=[1])]
     course: Annotated[CoursePublic, Field(description="Curso al que pertenece")]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TopicPublicNoDescription(BaseModel):
+    id: Annotated[int, Field(description="ID del tema", examples=[1])]
     name: Annotated[
         str,
         Field(
@@ -77,11 +79,6 @@ class TopicPublicNoDescription(BaseModel):
     ]
     course: Annotated[CoursePublic, Field(description="Curso al que pertenece")]
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class TopicPublicDetailed(TopicBase):
-    course: CoursePublic
     model_config = ConfigDict(from_attributes=True)
 
 
