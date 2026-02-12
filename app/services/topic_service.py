@@ -1,5 +1,4 @@
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.testing import exclude
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.v1.course.repository import CourseRepository
 from app.api.v1.topic.repository import TopicRepository
