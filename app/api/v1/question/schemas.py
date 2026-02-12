@@ -11,7 +11,7 @@ from app.api.v1.question_content.schemas import (
 )
 from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
 from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
-from app.api.v1.subtopic.schemas import SubtopicPublic
+from app.api.v1.subtopic.schemas import SubtopicSimplePublic
 
 
 class QuestionType(IntEnum):
@@ -101,7 +101,7 @@ class QuestionCreateInput(QuestionBase):
 class QuestionStudyResponse(BaseModel):
     id: int
     question_type: QuestionTypeCodeOnly
-    subtopic: SubtopicPublic
+    subtopic: SubtopicSimplePublic
     difficulty: DifficultyPublic
     areas: list[str]
     contents: list[QuestionContentResponse]
@@ -136,7 +136,7 @@ class QuestionSimpleStudyResponse(BaseModel):
     id: int
     contents: list[QuestionContentResponse]
     difficulty: DifficultyPublic
-    subtopic: SubtopicPublic
+    subtopic: SubtopicSimplePublic
     choices: list[ChoicePublic]
     solution: SolutionPublic
 

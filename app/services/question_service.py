@@ -1,27 +1,28 @@
 import hashlib
 
-from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 
-from app.api.v1.area.repository import get_areas
-from app.api.v1.question.repository import get_questions_db
+from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
+from app.core.exceptions.technical import PersistenceError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
 from app.models.question_content import QuestionContent
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
-from app.services.image_service import ImageService
+from app.services.area_service import AreaService
 
 
 class QuestionService:
-    def __init__(self, image_service: ImageService):
-        self.image_service = image_service
+    def __init__(
+        self, question_repository: QuestionRepository, area_service: AreaService
+    ):
+        self.question_repository = question_repository
+        self.area_service = area_service
 
-    async def create_question(self, db: Session, question: QuestionCreateInput):
+    async def create_question(self, question: QuestionCreateInput):
         statement = ""
         for i in question.contents:
             if i.type == ContentType.IMAGE:
@@ -29,7 +30,8 @@ class QuestionService:
             statement += i.value
 
         question_hash = self._generate_question_hash(contents=question.contents)
-        areas = get_areas(db, question.area_ids)
+
+        areas = self.area_service.get_areas(question.area_ids)
 
         try:
             # Crear solución con contenidos
@@ -67,25 +69,18 @@ class QuestionService:
                 contents=question_contents,
                 solution=solution,
                 choices=choices,
-                areas=areas,  # ✅ Asignar directamente en el constructor
+                areas=areas,
             )
 
-            # Agregar y commitear
-            db.add(new_question)
-            db.commit()
-            db.refresh(new_question)
-
-            return new_question
+            return self.question_repository.create_question_db(new_question)
         except SQLAlchemyError as e:
-            db.rollback()
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error al crear la pregunta en la base de datos: {str(e)}",
+            raise PersistenceError(
+                message=f"Error al crear la pregunta en la base de datos: {str(e)}"
             )
 
-    def get_all_questions(self, db: Session, page: int, per_page: int):
+    def get_all_questions(self, page: int, per_page: int):
         """Obtiene todas las preguntas."""
-        return get_questions_db(db, page=page, limit=per_page)
+        return self.question_repository.get_questions_db(page=page, limit=per_page)
 
     def _generate_question_hash(
         self, contents: list[QuestionContentCreateInput]

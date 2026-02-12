@@ -3,24 +3,33 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from app.api.v1.area.repository import AreaRepository
+from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import (
     QuestionCreateInput,
     QuestionPaginatedResponse,
     QuestionStudyResponse,
 )
 from app.db.session import get_session
-from app.infrastructure.gcp.storage_adapter import GCPStorageAdapter
-from app.services.image_service import ImageService
+from app.services.area_service import AreaService
 from app.services.question_service import QuestionService
 
 question_router = APIRouter(tags=["Question"])
 
 
 # Dependency injection
-def get_question_service() -> QuestionService:
-    gcp_storage = GCPStorageAdapter()
-    image_service = ImageService(storage=gcp_storage)
-    return QuestionService(image_service)
+def get_area_service(db: Annotated[Session, Depends(get_session)]):
+    area_repository = AreaRepository(db)
+    return AreaService(area_repository)
+
+
+def get_question_service(
+    db: Annotated[Session, Depends(get_session)],
+    area_service: Annotated[AreaService, Depends(get_area_service)],
+) -> QuestionService:
+    question_repository = QuestionRepository(db)
+
+    return QuestionService(question_repository, area_service)
 
 
 @question_router.post(
@@ -34,7 +43,6 @@ async def add_question(
     """Endpoint para crear una nueva pregunta."""
 
     return await service.create_question(
-        db=db,
         question=question,
     )
 
@@ -54,7 +62,5 @@ def get_questions(
 ):
     """
     Este endpoint recupera preguntas de la base de datos con soporte para paginación.
-    - **page**: El número de la página que deseas consultar.
-    - **per_page**: La cantidad de preguntas que deseas obtener por página.
     """
-    return service.get_all_questions(db, page=page, per_page=per_page)
+    return service.get_all_questions(page=page, per_page=per_page)
