@@ -2,20 +2,22 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.v1.course.schemas import CoursePublic, CourseResponse
+
 
 class TopicBase(BaseModel):
     name: Annotated[
         str,
         Field(
-            min_length=1, description="Nombre del curso", examples=["Nombre del curso"]
+            min_length=1, description="Nombre del tema", examples=["Nombre del tema"]
         ),
     ]
     description: Annotated[
         str,
         Field(
             min_length=10,
-            description="Descripción del curso",
-            examples=["Descripción del curso"],
+            description="Descripción del tema",
+            examples=["Descripción del tema"],
         ),
     ]
 
@@ -29,27 +31,72 @@ class TopicCreate(TopicBase):
 
 class TopicResponse(TopicBase):
     id: int
-    course_id: Annotated[int, Field(description="ID del curso al que pertenece")]
+    course: Annotated[CourseResponse, Field(description="Curso al que pertenece")]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TopicUpdate(BaseModel):
     name: Annotated[
-        str | None, Field(default=None, min_length=1, description="Nombre del curso")
+        str | None,
+        Field(
+            default=None,
+            min_length=1,
+            description="Nombre del tema",
+            examples=["Nombre del tema"],
+        ),
     ]
     description: Annotated[
         str | None,
-        Field(default=None, min_length=10, description="Descripción del curso"),
+        Field(
+            default=None,
+            min_length=10,
+            description="Descripción del tema",
+            examples=["Descripción del tema"],
+        ),
+    ]
+    course_id: Annotated[
+        int | None,
+        Field(default=None, description="ID del curso al que pertenece", examples=[1]),
     ]
 
 
 # PÚBLICO
-class TopicPublic(BaseModel):
-    name: Annotated[str, Field(description="Nombre del curso")]
+class TopicPublic(TopicBase):
+    course: Annotated[CoursePublic, Field(description="Curso al que pertenece")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TopicPublicNoDescription(BaseModel):
+    name: Annotated[
+        str,
+        Field(
+            min_length=1, description="Nombre del tema", examples=["Nombre del tema"]
+        ),
+    ]
+    course: Annotated[CoursePublic, Field(description="Curso al que pertenece")]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TopicPublicDetailed(TopicBase):
+    course: CoursePublic
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TopicPaginatedResponse(BaseModel):
+    total_count: Annotated[int, Field(description="Total de temas")]
+    total_pages: Annotated[int, Field(description="Número de páginas")]
+    current_page: Annotated[int, Field(description="Página actual")]
+    items_count: Annotated[int, Field(description="Total de temas de la página actual")]
+    has_prev: Annotated[bool, Field(description="Indica si existe una página anterior")]
+    has_next: Annotated[
+        bool, Field(description="Indica si existe una página siguiente")
+    ]
+    items: Annotated[
+        list[TopicPublic],
+        Field(description="Lista de preguntas de la página actual"),
+    ]
+
     model_config = ConfigDict(from_attributes=True)
