@@ -10,15 +10,19 @@ from app.api.v1.subtopic.schemas import (
     SubtopicPublic,
     SubtopicUpdate,
 )
+from app.api.v1.topic.repository import TopicRepository
 from app.db.session import get_session
 from app.services.subtopic_service import SubtopicService
 
 subtopic_router = APIRouter(tags=["Subtopic"])
 
 
+# Inyección de Dependencia
 def get_subtopic_service(db: Annotated[Session, Depends(get_session)]):
-    repository = SubtopicRepository(db)
-    service = SubtopicService(repository)
+    subtopic_repository = SubtopicRepository(db)
+    topic_repository = TopicRepository(db)
+
+    service = SubtopicService(subtopic_repository, topic_repository)
     return service
 
 

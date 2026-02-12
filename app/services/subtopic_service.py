@@ -20,18 +20,25 @@ class SubtopicService:
             raise ResourceNotFoundException(
                 message=f"Subtopic with id {subtopic_id} not found"
             )
-        return subtopic_id
+        return subtopic
 
     def get_subtopics(self, page: int, limit: int):
         return self.repository.get_subtopics(page, limit)
 
     def create_subtopic(self, subtopic: SubtopicCreate):
+        # Validar que el ID de topic (FK) exista
+        if subtopic.topic_id is not None:
+            topic = self.topic_repository.get_topic(subtopic.topic_id)
+
+            if not topic:
+                raise ResourceNotFoundException(
+                    message=f"Topic with id {subtopic.topic_id} not found"
+                )
+
         try:
             new_subtopic = self.repository.create_subtopic(subtopic)
         except IntegrityError:
-            raise ResourceNotFoundException(
-                message=f"Topic with id {subtopic.topic_id} not found"
-            )
+            raise PersistenceError("Integrity error persisting subtopic")
         except SQLAlchemyError:
             raise PersistenceError("Error persisting subtopic")
         else:

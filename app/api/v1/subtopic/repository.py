@@ -49,7 +49,7 @@ class SubtopicRepository:
         )
 
     def create_subtopic(self, subtopic: SubtopicCreate):
-        db_subtopic = Subtopic(**subtopic.model_dump())
+        db_subtopic = Subtopic(name=subtopic.name, topic_id=subtopic.topic_id)
         try:
             self.db.add(db_subtopic)
             self.db.commit()

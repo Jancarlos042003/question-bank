@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.api.v1.topic.schemas import TopicPublic
+from app.api.v1.topic.schemas import TopicSimplePublic
 
 
 class SubtopicBase(BaseModel):
@@ -11,7 +11,7 @@ class SubtopicBase(BaseModel):
         Field(
             min_length=1,
             description="Nombre del subtema",
-            examples=["La Biología y la materia viviente"],
+            examples=["Los Organelos Celulares"],
         ),
     ]
 
@@ -29,7 +29,7 @@ class SubtopicUpdate(BaseModel):
         Field(
             min_length=1,
             description="Nombre del subtema",
-            examples=["La Biología y la materia viviente"],
+            examples=["Los Organelos Celulares"],
         ),
     ] = None
     topic_id: Annotated[
@@ -40,11 +40,12 @@ class SubtopicUpdate(BaseModel):
 
 # PUBLIC
 class SubtopicSimplePublic(BaseModel):
+    id: Annotated[int, Field(description="ID del subtema", examples=[1])]
     name: Annotated[
         str,
         Field(
             description="Nombre del subtema",
-            examples=["La Biología y la materia viviente"],
+            examples=["Los Organelos Celulares"],
         ),
     ]
 
@@ -52,15 +53,17 @@ class SubtopicSimplePublic(BaseModel):
 
 
 class SubtopicPublic(BaseModel):
+    id: Annotated[int, Field(description="ID del subtema", examples=[1])]
     name: Annotated[
         str,
         Field(
             description="Nombre del subtema",
-            examples=["La Biología y la materia viviente"],
+            examples=["Los Organelos Celulares"],
         ),
     ]
     topic: Annotated[
-        TopicPublic, Field(description="Tema al que pertenece", examples=["La célula"])
+        TopicSimplePublic,
+        Field(description="Tema al que pertenece", examples=["La célula"]),
     ]
 
     model_config = ConfigDict(from_attributes=True)
