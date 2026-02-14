@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.v1.image.router import image_router
 from app.api.v1.question.router import question_router
 from app.api.v1.subtopic.router import subtopic_router
 from app.api.v1.topic.router import topic_router
@@ -17,6 +18,7 @@ register_exception_handlers(app)
 app.include_router(question_router, prefix="/questions")
 app.include_router(topic_router, prefix="/topics")
 app.include_router(subtopic_router, prefix="/subtopics")
+app.include_router(image_router, prefix="/images")
 
 
 @app.get("/")
