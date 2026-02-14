@@ -74,8 +74,12 @@ class ImageService:
             )
         except Forbidden:
             logger.error("Permisos insuficientes para generar URL firmada")
+            raise StoragePermissionDeniedError(
+                "Permisos insuficientes para generar URL firmada"
+            )
         except BadRequest as e:
             logger.error("Parámetros inválidos al generar la URL: %s", e.message)
+            raise StorageError("Parámetros inválidos al generar la URL")
         except GoogleAPIError as e:
             logger.error("Error de Google Cloud Storage: %s", e, exc_info=True)
             raise StorageError("Error en el servicio de almacenamiento")
