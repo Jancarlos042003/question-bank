@@ -50,6 +50,7 @@ class GCPStorageAdapter(StoragePort):
         bucket = self.storage_client.bucket(storage_container_name)
         blob = bucket.blob(destination)
 
+        # Subir la imagen a GCS desde bytes
         blob.upload_from_string(data, content_type=content_type)
 
-        return destination[1:]
+        return destination
