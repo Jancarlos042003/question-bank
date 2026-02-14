@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
+from app.core.exceptions.domain import DuplicateQuestionHashError
 from app.core.exceptions.technical import PersistenceError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
@@ -73,6 +74,8 @@ class QuestionService:
             )
 
             return self.question_repository.create_question_db(new_question)
+        except DuplicateQuestionHashError:
+            raise DuplicateQuestionHashError("La pregunta ya existe en la base de datos")
         except SQLAlchemyError as e:
             raise PersistenceError(
                 message=f"Error al crear la pregunta en la base de datos: {str(e)}"
