@@ -2,7 +2,7 @@ from app.core.exceptions.base import TechnicalException
 
 
 class PersistenceError(TechnicalException):
-    """"""
+    """Error al persistir datos en la base de datos."""
 
     error_code = "persistence_error"
 
@@ -11,7 +11,7 @@ class PersistenceError(TechnicalException):
 
 
 class StorageError(TechnicalException):
-    """"""
+    """Errores relacionados con el almacenamiento de archivos."""
 
     error_code = "storage_error"
 
@@ -20,7 +20,7 @@ class StorageError(TechnicalException):
 
 
 class StorageBucketNotFoundError(StorageError):
-    """"""
+    """El bucket de almacenamiento no existe."""
 
     error_code = "storage_bucket_not_found"
 
@@ -29,7 +29,7 @@ class StorageBucketNotFoundError(StorageError):
 
 
 class StoragePermissionDeniedError(StorageError):
-    """"""
+    """No se tienen permisos para acceder al almacenamiento."""
 
     error_code = "storage_permission_denied"
 
