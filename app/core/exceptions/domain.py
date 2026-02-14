@@ -2,16 +2,45 @@ from app.core.exceptions.base import DomainException
 
 
 class ResourceNotFoundException(DomainException):
-    """Raised when a requested domain entity does not exist."""
+    """No se encuentra un recurso"""
 
     error_code = "resource_not_found"
 
     def __init__(self, message: str = "Resource not found"):
         super().__init__(message=message, status_code=404)
 
+
 class DuplicateQuestionHashError(DomainException):
-    """Raised when a requested domain entity does not exist."""
+    """Hash de la pregunta duplicado"""
 
     error_code = "duplicate_question_hash"
+
     def __init__(self, message: str = "Duplicate question hash"):
+        super().__init__(message=message, status_code=400)
+
+
+class MultipleCorrectChoicesError(DomainException):
+    """Más de una alternativa marcada como correcta"""
+
+    error_code = "multiple_correct_choices"
+
+    def __init__(self, message: str = "Multiple correct choices"):
+        super().__init__(message=message, status_code=400)
+
+
+class NoCorrectChoiceError(DomainException):
+    """No se encontró ninguna alternativa correcta"""
+
+    error_code = "no_correct_choice"
+
+    def __init__(self, message: str = "No correct choice"):
+        super().__init__(message=message, status_code=400)
+
+
+class DuplicateChoiceContentError(DomainException):
+    """Contenido duplicado en las alternativas"""
+
+    error_code = "duplicate_choice_content"
+
+    def __init__(self, message: str = "Duplicate choice content"):
         super().__init__(message=message, status_code=400)

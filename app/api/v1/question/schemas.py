@@ -12,6 +12,11 @@ from app.api.v1.question_content.schemas import (
 from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
 from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
 from app.api.v1.subtopic.schemas import SubtopicSimplePublic
+from app.core.exceptions.domain import (
+    MultipleCorrectChoicesError,
+    NoCorrectChoiceError,
+    DuplicateChoiceContentError,
+)
 
 
 class QuestionType(IntEnum):
@@ -27,13 +32,7 @@ class QuestionBase(BaseModel):
         QuestionType,
         Field(
             description="Tipo de pregunta",
-            examples=[
-                "1=Directa",
-                "2=Verdadero/Falso",
-                "3=Relacionar",
-                "4=Ordenamiento",
-                "5=Completación",
-            ],
+            examples=[1],
         ),
     ]
     subtopic_id: int
@@ -51,7 +50,7 @@ class QuestionCreateInput(QuestionBase):
         Field(
             min_length=1,
             description="Lista de IDs de áreas válidas",
-            examples=["1=A", "2=B", "3=C", "4=D", "5=E"],
+            examples=[1, 2, 3, 4, 5],
             default_factory=list,
         ),
     ]
@@ -73,8 +72,12 @@ class QuestionCreateInput(QuestionBase):
         """Valida que exista exactamente una alternativa marcada como correcta (true)."""
         correct = sum(1 for c in choices if c.is_correct)
 
-        if correct != 1:
-            raise ValueError("Debe existir exactamente una alternativa correcta")
+        if correct == 0:
+            raise NoCorrectChoiceError("Debe existir al menos una alternativa correcta")
+        elif correct > 1:
+            raise MultipleCorrectChoicesError(
+                "Debe existir exactamente una alternativa correcta"
+            )
 
         return choices
 
@@ -89,7 +92,9 @@ class QuestionCreateInput(QuestionBase):
                 normalized = content.value.strip().lower()
 
                 if normalized in unique_choices:
-                    raise ValueError("Las respuestas deben ser únicas")
+                    raise DuplicateChoiceContentError(
+                        f"Las respuestas deben ser únicas. Contenido duplicado: '{normalized}'"
+                    )
 
                 unique_choices.add(normalized)
 
