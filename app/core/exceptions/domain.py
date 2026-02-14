@@ -10,6 +10,7 @@ class ResourceNotFoundException(DomainException):
         super().__init__(message=message, status_code=404)
 
 
+# QUESTION
 class DuplicateQuestionHashError(DomainException):
     """Hash de la pregunta duplicado"""
 
@@ -43,4 +44,14 @@ class DuplicateChoiceContentError(DomainException):
     error_code = "duplicate_choice_content"
 
     def __init__(self, message: str = "Duplicate choice content"):
+        super().__init__(message=message, status_code=400)
+
+
+# IMAGE
+class ContentTypeError(DomainException):
+    """Tipo de contenido no válido"""
+
+    error_code = "content_type_error"
+
+    def __init__(self, message: str = "Content type error"):
         super().__init__(message=message, status_code=400)
