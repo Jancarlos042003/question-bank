@@ -4,8 +4,6 @@ from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.course import Course
 from app.models.difficulty import Difficulty
-from app.models.modality import Modality
-from app.models.period import Period
 from app.models.question import Question
 from app.models.question_content import QuestionContent
 from app.models.question_type import QuestionType
