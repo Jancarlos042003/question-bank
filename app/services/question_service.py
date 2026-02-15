@@ -14,14 +14,19 @@ from app.models.question_content import QuestionContent
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
 from app.services.area_service import AreaService
+from app.services.image_service import ImageService
 
 
 class QuestionService:
     def __init__(
-        self, question_repository: QuestionRepository, area_service: AreaService
+            self,
+            question_repository: QuestionRepository,
+            area_service: AreaService,
+            image_service: ImageService,
     ):
         self.question_repository = question_repository
         self.area_service = area_service
+        self.image_service = image_service
 
     async def create_question(self, question: QuestionCreateInput):
         statement = ""
@@ -75,18 +80,26 @@ class QuestionService:
 
             return self.question_repository.create_question_db(new_question)
         except DuplicateQuestionHashError:
-            raise DuplicateQuestionHashError("La pregunta ya existe en la base de datos")
+            raise DuplicateQuestionHashError(
+                "La pregunta ya existe en la base de datos"
+            )
         except SQLAlchemyError as e:
             raise PersistenceError(
                 message=f"Error al crear la pregunta en la base de datos: {str(e)}"
             )
 
-    def get_all_questions(self, page: int, per_page: int):
+    def get_all_questions(self, page: int, limit: int):
         """Obtiene todas las preguntas."""
-        return self.question_repository.get_questions_db(page=page, limit=per_page)
+        questions = self.question_repository.get_questions_db(page=page, limit=limit)
+
+        # Generar URLs firmadas para todas las imágenes
+        for question in questions.items:
+            self._sign_question_images(question)
+
+        return questions
 
     def _generate_question_hash(
-        self, contents: list[QuestionContentCreateInput]
+            self, contents: list[QuestionContentCreateInput]
     ) -> str:
         base = ""
         for i in contents:
@@ -96,3 +109,24 @@ class QuestionService:
             base += i.value.strip().lower()
 
         return hashlib.sha256(base.encode("utf-8")).hexdigest()
+
+    def _sign_question_images(self, question):
+        """Genera URLs firmadas para todas las imágenes de una pregunta."""
+        # Firmar imágenes en contents
+        self._sign_contents(question.contents)
+
+        # Firmar imágenes en choices
+        for choice in question.choices:
+            self._sign_contents(choice.contents)
+
+        # Firmar imágenes en solution
+        if question.solution:
+            self._sign_contents(question.solution.contents)
+
+    def _sign_contents(self, contents: list):
+        """Firma las URLs de los contenidos de tipo imagen."""
+        for content in contents:
+            if content.type == ContentType.IMAGE:
+                content.value = self.image_service.generate_signature(
+                    storage_object_name=content.value
+                )
