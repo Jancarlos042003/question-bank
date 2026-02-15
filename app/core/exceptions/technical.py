@@ -10,6 +10,15 @@ class PersistenceError(TechnicalException):
         super().__init__(message=message, status_code=500)
 
 
+class DeleteError(TechnicalException):
+    """Error al eliminar un recurso de la base de datos."""
+
+    error_code = "delete_error"
+
+    def __init__(self, message: str = "Error deleting resource"):
+        super().__init__(message=message, status_code=500)
+
+
 class StorageError(TechnicalException):
     """Errores relacionados con el almacenamiento de archivos."""
 
