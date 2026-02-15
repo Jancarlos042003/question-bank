@@ -1,4 +1,5 @@
 import hashlib
+import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -15,6 +16,8 @@ from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
 from app.services.area_service import AreaService
 from app.services.image_service import ImageService
+
+logger = logging.getLogger(__name__)
 
 
 class QuestionService:
@@ -84,8 +87,9 @@ class QuestionService:
                 "La pregunta ya existe en la base de datos"
             )
         except SQLAlchemyError as e:
+            logger.error("Error al crear la pregunta en la base de datos: %s", e)
             raise PersistenceError(
-                message=f"Error al crear la pregunta en la base de datos: {str(e)}"
+                message=f"Error al crear la pregunta en la base de datos."
             )
 
     def get_all_questions(self, page: int, limit: int):
