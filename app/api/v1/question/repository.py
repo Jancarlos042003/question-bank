@@ -1,6 +1,7 @@
 import math
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.v1.question.schemas import QuestionPaginatedResponse
@@ -20,11 +21,15 @@ class QuestionRepository:
         if existing:
             raise DuplicateQuestionHashError
 
-        self.db.add(question)
-        self.db.commit()
-        self.db.refresh(question)
-
-        return question
+        try:
+            self.db.add(question)
+            self.db.commit()
+            self.db.refresh(question)
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
+        else:
+            return question
 
     def get_questions_db(self, page: int, limit: int):
         offset = (page - 1) * limit
