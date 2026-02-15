@@ -11,11 +11,11 @@ image_router = APIRouter(tags=["Image"])
 
 
 # DEPENDENCIAS
-def get_gpc_storage():
+def get_gcp_storage() -> StoragePort:
     return GCPStorageAdapter()
 
 
-def get_image_service(storage: Annotated[StoragePort, Depends(get_gpc_storage)]):
+def get_image_service(storage: Annotated[StoragePort, Depends(get_gcp_storage)]):
     return ImageService(storage)
 
 
