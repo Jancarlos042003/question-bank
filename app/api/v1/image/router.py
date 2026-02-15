@@ -16,7 +16,7 @@ def get_gcp_storage() -> StoragePort:
 
 
 def get_image_service(storage: Annotated[StoragePort, Depends(get_gcp_storage)]):
-    return ImageService(storage)
+    return ImageService(storage, settings.CONTAINER_NAME)
 
 
 @image_router.post("", summary="Subir imagen")
@@ -32,9 +32,5 @@ async def upload_image(
         ],
 ):
     return await service.upload_image(
-        image=image,
-        storage_container_name=settings.CONTAINER_NAME,
-        # En GCS, no existen las carpetas reales, solo objetos con nombres largos.
-        # TODO manejar el caso donde existen nombres repetidos
-        destination=f"unmsm/courses/{course}/{directory}/{image.filename}",
+        image=image, destination=f"unmsm/courses/{course}/{directory}/{image.filename}"
     )

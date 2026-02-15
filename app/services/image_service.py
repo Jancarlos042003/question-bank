@@ -20,12 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 class ImageService:
-    def __init__(self, storage: StoragePort):
+    def __init__(self, storage: StoragePort, storage_container_name: str):
         self.storage = storage
+        self.storage_container_name = storage_container_name
 
-    async def upload_image(
-            self, image: UploadFile, storage_container_name: str, destination: str
-    ) -> str:
+    async def upload_image(self, image: UploadFile, destination: str) -> str:
         allowed_content_types = {"image/jpeg", "image/png", "image/webp"}
 
         # Verificar el tipo de contenido
@@ -38,18 +37,18 @@ class ImageService:
 
         try:
             image_path = self.storage.upload_object_from_bytes(
-                storage_container_name=storage_container_name,
+                storage_container_name=self.storage_container_name,
                 data=image_bytes,
                 destination=destination,
                 content_type=image.content_type,
             )
         except NotFound:
-            logger.error("El bucket '%s' no existe", storage_container_name)
+            logger.error("El bucket '%s' no existe", self.storage_container_name)
             raise StorageBucketNotFoundError("El bucket no existe")
         except Forbidden:
             logger.error(
                 "Permisos insuficientes para subir al bucket '%s'",
-                storage_container_name,
+                self.storage_container_name,
             )
             raise StoragePermissionDeniedError(
                 "Permisos insuficientes para subir el archivo"
@@ -66,10 +65,10 @@ class ImageService:
         else:
             return image_path
 
-    def generate_signature(self, storage_container_name: str, storage_object_name: str):
+    def generate_signature(self, storage_object_name: str):
         try:
             url = self.storage.generate_signed_url(
-                storage_container_name=storage_container_name,
+                storage_container_name=self.storage_container_name,
                 storage_object_name=storage_object_name,
             )
         except Forbidden:
