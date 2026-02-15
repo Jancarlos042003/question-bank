@@ -19,14 +19,17 @@ def get_image_service(storage: Annotated[StoragePort, Depends(get_gpc_storage)])
     return ImageService(storage)
 
 
-@image_router.post("")
+@image_router.post("", summary="Subir imagen")
 async def upload_image(
-    image: Annotated[UploadFile, File(description="Imagen a subir")],
-    service: Annotated[ImageService, Depends(get_image_service)],
-    course: Annotated[str, Query(description="Nombre del curso")],
-    directory: Annotated[
-        str, Query(description="Carpeta destino (statements / choices / solutions)")
-    ],
+        image: Annotated[UploadFile, File(description="Imagen a subir")],
+        service: Annotated[ImageService, Depends(get_image_service)],
+        course: Annotated[str, Query(description="Nombre del curso")],
+        directory: Annotated[
+            str,
+            Query(
+                description="Carpeta destino de almacenamiento (statements / choices / solutions)"
+            ),
+        ],
 ):
     return await service.upload_image(
         image=image,
