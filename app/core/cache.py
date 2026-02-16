@@ -2,6 +2,7 @@ from redis import Redis
 
 from app.core.config import settings
 
+# https://redis.io/docs/latest/develop/clients/redis-py/connect/#basic-connection
 redis_client = Redis(
     host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
 )
