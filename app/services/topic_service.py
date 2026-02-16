@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class TopicService:
-    def __init__(self, repository: TopicRepository, course_service: CourseService):
+    def __init__(
+            self, repository: TopicRepository, course_service: CourseService | None = None
+    ):
         self.repository = repository
         self.course_service = course_service
 
@@ -53,12 +55,7 @@ class TopicService:
 
     def create_topic(self, topic: TopicCreate):
         # Validar que el ID de curso (FK) exista
-        course = self.course_service.get_course(topic.course_id)
-
-        if not course:
-            raise ResourceNotFoundException(
-                f"No se encontró el curso con id {topic.course_id}"
-            )
+        self.course_service.get_course(topic.course_id)
 
         try:
             new_topic = self.repository.create_topic(topic)
@@ -75,12 +72,7 @@ class TopicService:
 
     def update_topic(self, topic_id: int, topic: TopicUpdate):
         # Validar que el ID de curso (FK) exista
-        course = self.course_service.get_course(topic.course_id)
-
-        if not course:
-            raise ResourceNotFoundException(
-                f"No se encontró el curso con id {topic.course_id}"
-            )
+        self.course_service.get_course(topic.course_id)
 
         try:
             updated_topic = self.repository.update_topic(topic_id, topic)
