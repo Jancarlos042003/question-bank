@@ -13,17 +13,23 @@ from app.api.v1.subtopic.schemas import (
 from app.api.v1.topic.repository import TopicRepository
 from app.db.session import get_session
 from app.services.subtopic_service import SubtopicService
+from app.services.topic_service import TopicService
 
 subtopic_router = APIRouter(tags=["Subtopic"])
 
 
 # Inyección de Dependencia
-def get_subtopic_service(db: Annotated[Session, Depends(get_session)]):
-    subtopic_repository = SubtopicRepository(db)
+def get_topic_service(db: Annotated[Session, Depends(get_session)]):
     topic_repository = TopicRepository(db)
+    return TopicService(topic_repository)
 
-    service = SubtopicService(subtopic_repository, topic_repository)
-    return service
+
+def get_subtopic_service(
+        db: Annotated[Session, Depends(get_session)],
+        topic_service: Annotated[TopicService, Depends(get_topic_service)],
+):
+    subtopic_repository = SubtopicRepository(db)
+    return SubtopicService(subtopic_repository, topic_service)
 
 
 @subtopic_router.post(
@@ -33,8 +39,8 @@ def get_subtopic_service(db: Annotated[Session, Depends(get_session)]):
     summary="Crea un nuevo subtema",
 )
 def add_subtopic(
-    service: Annotated[SubtopicService, Depends(get_subtopic_service)],
-    subtopic: SubtopicCreate,
+        service: Annotated[SubtopicService, Depends(get_subtopic_service)],
+        subtopic: SubtopicCreate,
 ):
     """Crea un nuevo subtema con los datos proporcionados."""
     return service.create_subtopic(subtopic)
@@ -46,11 +52,11 @@ def add_subtopic(
     summary="Lista de subtemas",
 )
 def read_subtopics(
-    service: Annotated[SubtopicService, Depends(get_subtopic_service)],
-    page: Annotated[int, Query(ge=1, description="Número de página")] = 1,
-    limit: Annotated[
-        int, Query(ge=1, le=100, description="Cantidad de elementos por página")
-    ] = 100,
+        service: Annotated[SubtopicService, Depends(get_subtopic_service)],
+        page: Annotated[int, Query(ge=1, description="Número de página")] = 1,
+        limit: Annotated[
+            int, Query(ge=1, le=100, description="Cantidad de elementos por página")
+        ] = 100,
 ):
     """Recupera una lista de subtemas con soporte de paginación."""
     return service.get_subtopics(page, limit)
@@ -62,8 +68,8 @@ def read_subtopics(
     summary="Obtener un subtema por ID",
 )
 def read_subtopic(
-    service: Annotated[SubtopicService, Depends(get_subtopic_service)],
-    subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
+        service: Annotated[SubtopicService, Depends(get_subtopic_service)],
+        subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
 ):
     """
     Recupera los detalles de un subtema específico utilizando su identificador único.
@@ -77,9 +83,9 @@ def read_subtopic(
     summary="Actualizar un subtema",
 )
 def update_subtopic(
-    service: Annotated[SubtopicService, Depends(get_subtopic_service)],
-    subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
-    subtopic: SubtopicUpdate,
+        service: Annotated[SubtopicService, Depends(get_subtopic_service)],
+        subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
+        subtopic: SubtopicUpdate,
 ):
     """Actualiza la información de un subtema existente."""
     return service.update_subtopic(subtopic_id, subtopic)
@@ -91,8 +97,8 @@ def update_subtopic(
     summary="Eliminar un subtema",
 )
 def delete_subtopic(
-    service: Annotated[SubtopicService, Depends(get_subtopic_service)],
-    subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
+        service: Annotated[SubtopicService, Depends(get_subtopic_service)],
+        subtopic_id: Annotated[int, Path(ge=1, description="ID del subtema")],
 ):
     """Elimina un subtema del sistema."""
     return service.delete_subtopic(subtopic_id)

@@ -4,19 +4,17 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.subtopic.repository import SubtopicRepository
 from app.api.v1.subtopic.schemas import SubtopicCreate, SubtopicUpdate
-from app.api.v1.topic.repository import TopicRepository
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import PersistenceError, RetrievalError, DeleteError
+from app.services.topic_service import TopicService
 
 logger = logging.getLogger(__name__)
 
 
 class SubtopicService:
-    def __init__(
-            self, repository: SubtopicRepository, topic_repository: TopicRepository
-    ):
+    def __init__(self, repository: SubtopicRepository, topic_service: TopicService):
         self.repository = repository
-        self.topic_repository = topic_repository
+        self.topic_service = topic_service
 
     def get_subtopic(self, subtopic_id: int):
         try:
@@ -44,13 +42,9 @@ class SubtopicService:
 
     def create_subtopic(self, subtopic: SubtopicCreate):
         # Validar que el ID de topic (FK) exista
-        if subtopic.topic_id is not None:
-            topic = self.topic_repository.get_topic(subtopic.topic_id)
-
-            if not topic:
-                raise ResourceNotFoundException(
-                    message=f"Topic with id {subtopic.topic_id} not found"
-                )
+        self.topic_service.get_topic(
+            topic_id=subtopic.topic_id, include_description=False
+        )
 
         try:
             new_subtopic = self.repository.create_subtopic(subtopic)
@@ -65,13 +59,9 @@ class SubtopicService:
 
     def update_subtopic(self, subtopic_id: int, subtopic: SubtopicUpdate):
         # Validar que el ID de topic (FK) exista
-        if subtopic.topic_id is not None:
-            topic = self.topic_repository.get_topic(subtopic.topic_id)
-
-            if not topic:
-                raise ResourceNotFoundException(
-                    message=f"Tema con ID {subtopic.topic_id} no encontrado"
-                )
+        self.topic_service.get_topic(
+            topic_id=subtopic.topic_id, include_description=False
+        )
 
         try:
             updated_subtopic = self.repository.update_subtopic(subtopic_id, subtopic)
