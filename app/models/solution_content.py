@@ -22,6 +22,6 @@ class SolutionContent(Base):
     type: Mapped[ContentType] = mapped_column(String, nullable=False)
     value: Mapped[str] = mapped_column(String, nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
-    solution_id: Mapped[int] = mapped_column(ForeignKey("solutions.id"))
+    solution_id: Mapped[int] = mapped_column(ForeignKey("solutions.id"), index=True)
 
     solution: Mapped["Solution"] = relationship(back_populates="contents")

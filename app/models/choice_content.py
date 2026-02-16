@@ -22,6 +22,6 @@ class ChoiceContent(Base):
     type: Mapped[ContentType] = mapped_column(String, nullable=False)
     value: Mapped[str] = mapped_column(String, nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
-    choice_id: Mapped[int] = mapped_column(ForeignKey("choices.id"))
+    choice_id: Mapped[int] = mapped_column(ForeignKey("choices.id"), index=True)
 
     choice: Mapped["Choice"] = relationship(back_populates="contents")
