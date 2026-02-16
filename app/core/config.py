@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     CONTAINER_NAME: str
     # Solo para desarrollo local
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = "6379"
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env", env_file_encoding="utf-8"
