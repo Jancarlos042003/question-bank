@@ -19,6 +19,15 @@ class DeleteError(TechnicalException):
         super().__init__(message=message, status_code=500)
 
 
+class RetrievalError(TechnicalException):
+    """Error al obtener datos de la base de datos."""
+
+    error_code = "retrieval_error"
+
+    def __init__(self, message: str = "Error retrieving resource"):
+        super().__init__(message=message, status_code=500)
+
+
 class StorageError(TechnicalException):
     """Errores relacionados con el almacenamiento de archivos."""
 
