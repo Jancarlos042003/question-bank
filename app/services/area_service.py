@@ -1,5 +1,12 @@
+import logging
+
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.api.v1.area.repository import AreaRepository
 from app.core.exceptions.domain import ResourceNotFoundException
+from app.core.exceptions.technical import RetrievalError
+
+logger = logging.getLogger(__name__)
 
 
 class AreaService:
@@ -7,8 +14,13 @@ class AreaService:
         self.area_repository = area_repository
 
     def get_areas(self, ids: list[int]):
-        areas = self.area_repository.get_areas(ids)
+        try:
+            areas = self.area_repository.get_areas(ids)
+        except SQLAlchemyError as e:
+            logger.exception(f"Error al obtener áreas")
+            raise RetrievalError("Error al obtener áreas") from e
 
+        # Obtener los ID's encontrados
         found_ids = {area.id for area in areas}
 
         # Obtener los ID's faltantes
