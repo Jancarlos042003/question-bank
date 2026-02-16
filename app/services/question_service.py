@@ -1,7 +1,7 @@
 import hashlib
 import logging
 
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
@@ -86,11 +86,16 @@ class QuestionService:
             raise DuplicateQuestionHashError(
                 "La pregunta ya existe en la base de datos"
             )
+        except IntegrityError as e:
+            logger.exception("Error al crear la pregunta en la base de datos")
+            raise PersistenceError(
+                "Error al crear la pregunta en la base de datos"
+            ) from e
         except SQLAlchemyError as e:
-            logger.error("Error al crear la pregunta en la base de datos: %s", e)
+            logger.exception("Error al crear la pregunta en la base de datos")
             raise PersistenceError(
                 message=f"Error al crear la pregunta en la base de datos."
-            )
+            ) from e
 
     def get_all_questions(self, page: int, limit: int):
         """Obtiene todas las preguntas."""

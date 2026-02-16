@@ -1,7 +1,7 @@
 import math
 
 from sqlalchemy import func, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.v1.question.schemas import QuestionPaginatedResponse
@@ -25,6 +25,9 @@ class QuestionRepository:
             self.db.add(question)
             self.db.commit()
             self.db.refresh(question)
+        except IntegrityError:
+            self.db.rollback()
+            raise
         except SQLAlchemyError:
             self.db.rollback()
             raise
