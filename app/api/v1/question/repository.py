@@ -5,8 +5,10 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.v1.question.schemas import QuestionPaginatedResponse
+from app.core.cache import get_cached_count, set_cached_count
 from app.core.exceptions.domain import DuplicateQuestionHashError
 from app.models.question import Question
+from app.models.solution import Solution
 
 
 class QuestionRepository:
@@ -15,6 +17,7 @@ class QuestionRepository:
 
     def create_question_db(self, question: Question):
         """Crea una pregunta en la BD"""
+        # TODO eliminar este select y manejarlo en IntegrityError
         stmt = select(Question).where(Question.question_hash == question.question_hash)
         existing = self.db.scalar(stmt)
 
@@ -43,9 +46,7 @@ class QuestionRepository:
             .limit(limit)
             .offset(offset)
             .options(
-                selectinload(Question.choices),
-                selectinload(Question.contents),
-                selectinload(Question.solution),
+                selectinload(Question.solution).selectinload(Solution.contents),
             )
         )
 
@@ -53,7 +54,13 @@ class QuestionRepository:
         items = list(self.db.scalars(stmt).all())  # Convertir el Sequence a list
 
         # Obtener total
-        total = self.db.scalar(select(func.count()).select_from(Question))
+        # Intentar obtener del cache
+        total = get_cached_count()
+        if total is None:
+            # Si no está en cache, consultar BD
+            total = self.db.scalar(select(func.count()).select_from(Question))
+            # Guardar en cache por 5 minutos
+            set_cached_count(count=total, ttl=300)
 
         # Calcular número de páginas
         pages = math.ceil(total / limit)

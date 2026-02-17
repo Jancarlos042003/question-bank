@@ -29,9 +29,9 @@ class Question(Base):
         ForeignKey("difficulties.id"), index=True
     )
 
-    question_type: Mapped["QuestionType"] = relationship()
-    subtopic: Mapped["Subtopic"] = relationship()
-    difficulty: Mapped["Difficulty"] = relationship()
+    question_type: Mapped["QuestionType"] = relationship(lazy="joined")
+    subtopic: Mapped["Subtopic"] = relationship(lazy="joined")
+    difficulty: Mapped["Difficulty"] = relationship(lazy="joined")
 
     areas: Mapped[list["Area"]] = relationship(
         secondary=question_areas, back_populates="questions", lazy="selectin"
