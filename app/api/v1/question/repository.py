@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.api.v1.question.schemas import QuestionPaginatedResponse
 from app.core.cache import get_cached_count, set_cached_count
 from app.models.question import Question
+from app.models.question_source import QuestionSource
 from app.models.solution import Solution
 
 
@@ -28,7 +29,7 @@ class QuestionRepository:
         else:
             return question
 
-    def get_questions_db(self, page: int, limit: int):
+    def get_questions_db(self, page: int, limit: int, include_source: bool):
         offset = (page - 1) * limit
 
         stmt = (
@@ -38,6 +39,13 @@ class QuestionRepository:
             .offset(offset)
             .options(
                 selectinload(Question.solution).selectinload(Solution.contents),
+                (
+                    selectinload(Question.question_sources).selectinload(
+                        QuestionSource.source
+                    )
+                    if include_source
+                    else None
+                ),
             )
         )
 

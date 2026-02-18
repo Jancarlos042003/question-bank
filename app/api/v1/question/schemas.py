@@ -9,13 +9,14 @@ from app.api.v1.question_content.schemas import (
     QuestionContentCreateInput,
     QuestionContentResponse,
 )
+from app.api.v1.question_source.schemas import QuestionSourceCreateInput
 from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
 from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
 from app.api.v1.subtopic.schemas import SubtopicSimplePublic
 from app.core.exceptions.domain import (
+    DuplicateChoiceContentError,
     MultipleCorrectChoicesError,
     NoCorrectChoiceError,
-    DuplicateChoiceContentError,
 )
 
 
@@ -64,6 +65,14 @@ class QuestionCreateInput(QuestionBase):
     ]
     choices: Annotated[
         List[ChoiceCreateInput], Field(min_length=4, max_length=5, default_factory=list)
+    ]
+    sources: Annotated[
+        List[QuestionSourceCreateInput],
+        Field(
+            min_length=1,
+            description="Lista de fuentes asociadas a la pregunta",
+            default_factory=list,
+        ),
     ]
 
     @field_validator("choices")

@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.choice import Choice
     from app.models.difficulty import Difficulty
     from app.models.question_content import QuestionContent
+    from app.models.question_source import QuestionSource
     from app.models.question_type import QuestionType
     from app.models.solution import Solution
     from app.models.subtopic import Subtopic
@@ -47,6 +48,12 @@ class Question(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
         order_by="QuestionContent.order",
+    )
+    question_sources: Mapped[list["QuestionSource"]] = relationship(
+        back_populates="question",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="QuestionSource.id",
     )
     solution: Mapped["Solution"] = relationship(
         back_populates="question", cascade="all", uselist=False

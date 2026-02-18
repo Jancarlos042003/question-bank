@@ -1,21 +1,23 @@
 import hashlib
 import logging
 
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
-from app.core.exceptions.domain import ForeignKeyViolationError, DuplicateValueError
+from app.core.exceptions.domain import DuplicateValueError, ForeignKeyViolationError
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
 from app.models.question_content import QuestionContent
+from app.models.question_source import QuestionSource
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
 from app.services.area_service import AreaService
 from app.services.image_service import ImageService
+from app.services.source_service import SourceService
 
 logger = logging.getLogger(__name__)
 
@@ -25,22 +27,23 @@ class QuestionService:
             self,
             question_repository: QuestionRepository,
             area_service: AreaService,
+            source_service: SourceService,
             image_service: ImageService,
     ):
         self.question_repository = question_repository
         self.area_service = area_service
+        self.source_service = source_service
         self.image_service = image_service
 
     async def create_question(self, question: QuestionCreateInput):
-        statement = ""
-        for i in question.contents:
-            if i.type == ContentType.IMAGE:
-                break
-            statement += i.value
-
         question_hash = self._generate_question_hash(contents=question.contents)
 
         areas = self.area_service.get_areas(question.area_ids)
+        sources_ids = [
+            question_source.source_id for question_source in question.sources
+        ]
+        valid_sources = self.source_service.get_sources_by_ids(sources_ids)
+        source_by_id = {source.id: source for source in valid_sources}
 
         try:
             # Crear solución con contenidos
@@ -69,6 +72,15 @@ class QuestionService:
                 for c in question.contents
             ]
 
+            question_sources = [
+                QuestionSource(
+                    source_id=question_source.source_id,
+                    page=question_source.page,
+                    source=source_by_id[question_source.source_id],
+                )
+                for question_source in question.sources
+            ]
+
             # ✅ Crear pregunta con TODAS las relaciones de una vez
             new_question = Question(
                 question_type_id=question.question_type_id,
@@ -79,6 +91,7 @@ class QuestionService:
                 solution=solution,
                 choices=choices,
                 areas=areas,
+                question_sources=question_sources,
             )
 
             return self.question_repository.create_question_db(new_question)
@@ -98,20 +111,20 @@ class QuestionService:
                 raise ForeignKeyViolationError("La clave foránea no existe") from e
 
             raise PersistenceError(
-                f"Error al crear la pregunta en la base de datos."
+                "Error al crear la pregunta en la base de datos."
             ) from e
 
         except SQLAlchemyError as e:
             logger.exception("Error al crear la pregunta en la base de datos")
             raise PersistenceError(
-                message=f"Error al crear la pregunta en la base de datos."
+                message="Error al crear la pregunta en la base de datos."
             ) from e
 
-    def get_all_questions(self, page: int, limit: int):
+    def get_all_questions(self, page: int, limit: int, include_source: bool):
         """Obtiene todas las preguntas."""
         try:
             questions = self.question_repository.get_questions_db(
-                page=page, limit=limit
+                page=page, limit=limit, include_source=include_source
             )
         except SQLAlchemyError as e:
             logger.exception("Error al obtener las preguntas")
