@@ -42,26 +42,26 @@ class ImageService:
                 destination=destination,
                 content_type=image.content_type,
             )
-        except NotFound:
-            logger.error("El bucket '%s' no existe", self.storage_container_name)
-            raise StorageBucketNotFoundError("El bucket no existe")
-        except Forbidden:
-            logger.error(
+        except NotFound as e:
+            logger.exception("El bucket '%s' no existe", self.storage_container_name)
+            raise StorageBucketNotFoundError("El bucket no existe") from e
+        except Forbidden as e:
+            logger.exception(
                 "Permisos insuficientes para subir al bucket '%s'",
                 self.storage_container_name,
             )
             raise StoragePermissionDeniedError(
                 "Permisos insuficientes para subir el archivo"
-            )
+            ) from e
         except BadRequest as e:
-            logger.error("Error en la solicitud: %s", e.message)
-            raise StorageError("Solicitud inválida al subir archivo")
+            logger.exception("Error en la solicitud: %s", e.message)
+            raise StorageError("Solicitud inválida al subir archivo") from e
         except GoogleAPIError as e:
-            logger.error("Error de Google Cloud Storage: %s", e, exc_info=True)
-            raise StorageError("Error en el servicio de almacenamiento")
+            logger.exception("Error de Google Cloud Storage: %s", e)
+            raise StorageError("Error en el servicio de almacenamiento") from e
         except Exception as e:
-            logger.error("Error inesperado al subir archivo: %s", e, exc_info=True)
-            raise StorageError("Error inesperado en almacenamiento")
+            logger.exception("Error inesperado al subir archivo: %s", e)
+            raise StorageError("Error inesperado en almacenamiento") from e
         else:
             return image_path
 
@@ -77,15 +77,13 @@ class ImageService:
                 "Permisos insuficientes para generar URL firmada"
             )
         except BadRequest as e:
-            logger.error("Parámetros inválidos al generar la URL: %s", e.message)
-            raise StorageError("Parámetros inválidos al generar la URL")
+            logger.exception("Parámetros inválidos al generar la URL: %s", e.message)
+            raise StorageError("Parámetros inválidos al generar la URL") from e
         except GoogleAPIError as e:
-            logger.error("Error de Google Cloud Storage: %s", e, exc_info=True)
-            raise StorageError("Error en el servicio de almacenamiento")
+            logger.exception("Error de Google Cloud Storage: %s", e)
+            raise StorageError("Error en el servicio de almacenamiento") from e
         except Exception as e:
-            logger.error(
-                "Error inesperado al generar la URL firmada: %s", e, exc_info=True
-            )
-            raise StorageError("Error inesperado al generar la URL firmada")
+            logger.exception("Error inesperado al generar la URL firmada: %s", e)
+            raise StorageError("Error inesperado al generar la URL firmada") from e
         else:
             return url
