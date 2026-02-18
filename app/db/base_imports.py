@@ -4,10 +4,13 @@ from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.course import Course
 from app.models.difficulty import Difficulty
+from app.models.institution import Institution
 from app.models.question import Question
 from app.models.question_content import QuestionContent
+from app.models.question_source import QuestionSource
 from app.models.question_type import QuestionType
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
+from app.models.source import Source
 from app.models.subtopic import Subtopic
 from app.models.topic import Topic
