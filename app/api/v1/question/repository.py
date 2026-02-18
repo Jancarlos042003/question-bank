@@ -1,12 +1,11 @@
 import math
 
 from sqlalchemy import func, select
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.v1.question.schemas import QuestionPaginatedResponse
 from app.core.cache import get_cached_count, set_cached_count
-from app.core.exceptions.domain import DuplicateQuestionHashError
 from app.models.question import Question
 from app.models.solution import Solution
 
@@ -17,20 +16,12 @@ class QuestionRepository:
 
     def create_question_db(self, question: Question):
         """Crea una pregunta en la BD"""
-        # TODO eliminar este select y manejarlo en IntegrityError
-        stmt = select(Question).where(Question.question_hash == question.question_hash)
-        existing = self.db.scalar(stmt)
-
-        if existing:
-            raise DuplicateQuestionHashError
-
         try:
             self.db.add(question)
             self.db.commit()
             self.db.refresh(question)
-        except IntegrityError:
-            self.db.rollback()
-            raise
+
+        # No se necesita capturar IntegrityError porque ya hereda de SQLAlchemyError
         except SQLAlchemyError:
             self.db.rollback()
             raise

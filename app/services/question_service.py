@@ -6,8 +6,11 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
-from app.core.exceptions.domain import DuplicateQuestionHashError
-from app.core.exceptions.technical import PersistenceError
+from app.core.exceptions.domain import (
+    DuplicateQuestionHashError,
+    ForeignKeyViolationError,
+)
+from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
@@ -82,15 +85,25 @@ class QuestionService:
             )
 
             return self.question_repository.create_question_db(new_question)
-        except DuplicateQuestionHashError:
-            raise DuplicateQuestionHashError(
-                "La pregunta ya existe en la base de datos"
-            )
         except IntegrityError as e:
-            logger.exception("Error al crear la pregunta en la base de datos")
+            # Ya logueas stacktrace.
+            logger.exception("IntegrityError al crear la pregunta")
+
+            orig = getattr(e, "orig", None)
+            pgcode = getattr(orig, "pgcode", None)
+
+            if pgcode == "23505":
+                raise DuplicateQuestionHashError(
+                    "La pregunta ya existe en la base de datos"
+                ) from e
+
+            if pgcode == "23503":
+                raise ForeignKeyViolationError("La clave foránea no existe") from e
+
             raise PersistenceError(
-                "Error al crear la pregunta en la base de datos"
+                f"Error al crear la pregunta en la base de datos."
             ) from e
+
         except SQLAlchemyError as e:
             logger.exception("Error al crear la pregunta en la base de datos")
             raise PersistenceError(
@@ -99,7 +112,13 @@ class QuestionService:
 
     def get_all_questions(self, page: int, limit: int):
         """Obtiene todas las preguntas."""
-        questions = self.question_repository.get_questions_db(page=page, limit=limit)
+        try:
+            questions = self.question_repository.get_questions_db(
+                page=page, limit=limit
+            )
+        except SQLAlchemyError as e:
+            logger.exception("Error al obtener las preguntas")
+            raise RetrievalError("Error al obtener las preguntas") from e
 
         # Generar URLs firmadas para todas las imágenes
         for question in questions.items:
