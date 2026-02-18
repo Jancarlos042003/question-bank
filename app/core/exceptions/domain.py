@@ -10,16 +10,25 @@ class ResourceNotFoundException(DomainException):
         super().__init__(message=message, status_code=404)
 
 
-# QUESTION
-class DuplicateQuestionHashError(DomainException):
-    """Hash de la pregunta duplicado"""
+class DuplicateValueError(DomainException):
+    """Valor duplicado"""
 
-    error_code = "duplicate_question_hash"
+    error_code = "duplicate_value"
 
-    def __init__(self, message: str = "Duplicate question hash"):
+    def __init__(self, message: str = "Duplicate value"):
+        super().__init__(message=message, status_code=409)
+
+
+class ForeignKeyViolationError(DomainException):
+    """Violación de clave foránea"""
+
+    error_code = "foreign_key_violation"
+
+    def __init__(self, message: str = "Foreign key violation"):
         super().__init__(message=message, status_code=400)
 
 
+# QUESTION
 class MultipleCorrectChoicesError(DomainException):
     """Más de una alternativa marcada como correcta"""
 
