@@ -6,10 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import QuestionCreateInput
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
-from app.core.exceptions.domain import (
-    DuplicateQuestionHashError,
-    ForeignKeyViolationError,
-)
+from app.core.exceptions.domain import ForeignKeyViolationError, DuplicateValueError
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
@@ -93,7 +90,7 @@ class QuestionService:
             pgcode = getattr(orig, "pgcode", None)
 
             if pgcode == "23505":
-                raise DuplicateQuestionHashError(
+                raise DuplicateValueError(
                     "La pregunta ya existe en la base de datos"
                 ) from e
 
