@@ -19,15 +19,9 @@ class SolutionCreate(BaseModel):
     question_id: int
 
 
-class SolutionResponse(BaseModel):
-    id: int
-    contents: List[SolutionContentPublic]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 # PÚBLICO
 class SolutionPublic(BaseModel):
+    id: int
     contents: List[SolutionContentPublic]
 
     model_config = ConfigDict(from_attributes=True)

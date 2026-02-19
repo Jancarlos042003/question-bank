@@ -55,11 +55,14 @@ class QuestionService:
 
         try:
             # Crear solución con contenidos
-            solution_contents = [
-                SolutionContent(type=i.type, value=i.value, order=i.order)
-                for i in question.solution.contents
-            ]
-            solution = Solution(contents=solution_contents)
+            solutions = []
+            for solution in question.solutions:
+                solution_contents = [
+                    SolutionContent(type=i.type, value=i.value, order=i.order)
+                    for i in solution.contents
+                ]
+                solution = Solution(contents=solution_contents)
+                solutions.append(solution)
 
             # Crear opciones con contenidos
             choices = [
@@ -96,7 +99,7 @@ class QuestionService:
                 difficulty_id=question.difficulty_id,
                 question_hash=question_hash,
                 contents=question_contents,
-                solution=solution,
+                solutions=solutions,
                 choices=choices,
                 areas=areas,
                 question_sources=question_sources,
@@ -162,7 +165,7 @@ class QuestionService:
 
         self._sign_question_images(question, view)
 
-        if view:
+        if view == "summary":
             return QuestionSummaryPublic.model_validate(question)
 
         return QuestionDetailPublic.model_validate(question)
@@ -189,9 +192,9 @@ class QuestionService:
             for choice in question.choices:
                 self._sign_contents(choice.contents)
 
-            # Firmar imágenes en solution
-            if question.solution:
-                self._sign_contents(question.solution.contents)
+            # Firmar imágenes en solutions
+            for solution in question.solutions:
+                self._sign_contents(solution.contents)
 
     def _sign_contents(self, contents: list):
         """Firma las URLs de los contenidos de tipo imagen."""

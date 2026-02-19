@@ -61,8 +61,8 @@ class QuestionCreateInput(QuestionBase):
         List[QuestionContentCreateInput],
         Field(description="Contenido de la pregunta", default_factory=list),
     ]
-    solution: Annotated[
-        SolutionCreateInput, Field(description="Solución de la pregunta")
+    solutions: Annotated[
+        list[SolutionCreateInput], Field(description="Soluciones de la pregunta")
     ]
     choices: Annotated[
         List[ChoiceCreateInput], Field(min_length=4, max_length=5, default_factory=list)
@@ -121,7 +121,7 @@ class QuestionCreateResponse(BaseModel):
     areas: list[str]
     contents: list[QuestionContentResponse]
     choices: list[ChoicePublic]
-    solution: SolutionPublic
+    solutions: list[SolutionPublic]
     sources: Annotated[
         list[QuestionSourcePublic],
         Field(
@@ -193,7 +193,7 @@ class QuestionDetailPublic(BaseModel):
     areas: list[str]
     subtopic: SubtopicSimplePublic
     choices: list[ChoicePublic]
-    solution: SolutionPublic
+    solutions: list[SolutionPublic]
     sources: Annotated[
         list[QuestionSourcePublic],
         Field(

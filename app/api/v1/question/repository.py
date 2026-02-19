@@ -47,7 +47,7 @@ class QuestionRepository:
                 .offset(offset)
                 .options(
                     selectinload(Question.choices).selectinload(Choice.contents),
-                    selectinload(Question.solution).selectinload(Solution.contents),
+                    selectinload(Question.solutions).selectinload(Solution.contents),
                 )
             )
 
@@ -102,7 +102,7 @@ class QuestionRepository:
                 .where(Question.id == question_id)
                 .options(
                     selectinload(Question.choices).selectinload(Choice.contents),
-                    selectinload(Question.solution).selectinload(Solution.contents),
+                    selectinload(Question.solutions).selectinload(Solution.contents),
                 )
             )
 
