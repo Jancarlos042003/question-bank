@@ -1,6 +1,6 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.area.repository import AreaRepository
@@ -8,8 +8,11 @@ from app.api.v1.institution.repository import InstitutionRepository
 from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import (
     QuestionCreateInput,
-    QuestionPaginatedResponse,
-    QuestionStudyResponse,
+    QuestionCreateResponse,
+    QuestionPaginatedSummaryResponse,
+    QuestionPaginatedDetailResponse,
+    QuestionSummaryPublic,
+    QuestionDetailPublic,
 )
 from app.api.v1.source.repository import SourceRepository
 from app.core.config import settings
@@ -68,7 +71,7 @@ def get_question_service(
 
 
 @question_router.post(
-    "", response_model=QuestionStudyResponse, status_code=status.HTTP_201_CREATED
+    "", response_model=QuestionCreateResponse, status_code=status.HTTP_201_CREATED
 )
 async def add_question(
         db: Annotated[Session, Depends(get_session)],
@@ -84,7 +87,7 @@ async def add_question(
 
 @question_router.get(
     "",
-    response_model=QuestionPaginatedResponse,
+    response_model=QuestionPaginatedSummaryResponse | QuestionPaginatedDetailResponse,
     summary="Listar preguntas",
 )
 def get_questions(
@@ -93,11 +96,39 @@ def get_questions(
         limit: Annotated[
             int, Query(ge=1, le=100, description="Cantidad de preguntas por página")
         ] = 15,
-        include_source: Annotated[bool, Query(description="Incluir fuentes")] = False,
+        view: Annotated[
+            Literal["summary", "full"],
+            Query(description="Nivel de detalle de la pregunta."),
+        ] = "full",
 ):
     """
     Este endpoint recupera preguntas de la base de datos con soporte para paginación.
+
+    Nivel de detalle (view):
+    - `summary`: Versión resumida que no incluye alternativas ni solución.
+    - `full`: Versión completa que incluye toda la información disponible.
     """
-    return service.get_all_questions(
-        page=page, limit=limit, include_source=include_source
-    )
+    return service.get_all_questions(page=page, limit=limit, view=view)
+
+
+@question_router.get(
+    "/{question_id}",
+    response_model=QuestionSummaryPublic | QuestionDetailPublic,
+    summary="Obtener una pregunta",
+)
+def get_question(
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        view: Annotated[
+            Literal["summary", "full"],
+            Query(description="Nivel de detalle de la pregunta."),
+        ] = "full",
+):
+    """
+    Obtener una pregunta por su ID.
+
+    Nivel de detalle (view):
+    - `summary`: Versión resumida que no incluye alternativas ni solución.
+    - `full`: Versión completa que incluye toda la información disponible.
+    """
+    return service.get_question(question_id=question_id, view=view)

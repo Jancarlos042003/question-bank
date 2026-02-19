@@ -10,6 +10,7 @@ from app.api.v1.question_content.schemas import (
     QuestionContentResponse,
 )
 from app.api.v1.question_source.schemas import QuestionSourceCreateInput
+from app.api.v1.question_source.schemas import QuestionSourcePublic
 from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
 from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
 from app.api.v1.subtopic.schemas import SubtopicSimplePublic
@@ -112,7 +113,7 @@ class QuestionCreateInput(QuestionBase):
 
 # PÚBLICO
 # Para estudio / banco
-class QuestionStudyResponse(BaseModel):
+class QuestionCreateResponse(BaseModel):
     id: int
     question_type: QuestionTypeCodeOnly
     subtopic: SubtopicSimplePublic
@@ -121,6 +122,13 @@ class QuestionStudyResponse(BaseModel):
     contents: list[QuestionContentResponse]
     choices: list[ChoicePublic]
     solution: SolutionPublic
+    sources: Annotated[
+        list[QuestionSourcePublic],
+        Field(
+            validation_alias="question_sources",
+            description="Fuentes asociadas a la pregunta",
+        ),
+    ]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -146,33 +154,91 @@ class QuestionStudyResponse(BaseModel):
         return out
 
 
-class QuestionSimpleStudyResponse(BaseModel):
+class QuestionSummaryPublic(BaseModel):
     id: int
     contents: list[QuestionContentResponse]
     difficulty: DifficultyPublic
+    areas: list[str]
     subtopic: SubtopicSimplePublic
-    choices: list[ChoicePublic]
-    solution: SolutionPublic
+    sources: Annotated[
+        list[QuestionSourcePublic],
+        Field(
+            validation_alias="question_sources",
+            description="Fuentes asociadas a la pregunta",
+        ),
+    ]
 
     model_config = ConfigDict(from_attributes=True)
 
+    @field_validator("areas", mode="before")
+    @classmethod
+    def flatten_areas(cls, v):
+        if v is None:
+            return []
 
-class QuestionPaginatedResponse(BaseModel):
-    total_count: Annotated[int, Field(description="Total de preguntas")]
-    total_pages: Annotated[int, Field(description="Número de páginas")]
-    current_page: Annotated[int, Field(description="Página actual")]
-    items_count: Annotated[
-        int, Field(description="Total de preguntas de la página actual")
-    ]
-    has_prev: Annotated[bool, Field(description="Indica si existe una página anterior")]
-    has_next: Annotated[
-        bool, Field(description="Indica si existe una página siguiente")
-    ]
-    items: Annotated[
-        list[QuestionSimpleStudyResponse],
-        Field(description="Lista de preguntas de la página actual"),
+        out: list[str] = []
+        for item in v:
+            if hasattr(item, "code"):
+                out.append(item.code)
+                continue
+
+            out.append(str(item))
+        return out
+
+
+class QuestionDetailPublic(BaseModel):
+    id: int
+    contents: list[QuestionContentResponse]
+    difficulty: DifficultyPublic
+    areas: list[str]
+    subtopic: SubtopicSimplePublic
+    choices: list[ChoicePublic]
+    solution: SolutionPublic
+    sources: Annotated[
+        list[QuestionSourcePublic],
+        Field(
+            validation_alias="question_sources",
+            description="Fuentes asociadas a la pregunta",
+        ),
     ]
 
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("areas", mode="before")
+    @classmethod
+    def flatten_areas(cls, v):
+        if v is None:
+            return []
+
+        out: list[str] = []
+        for item in v:
+            if hasattr(item, "code"):
+                out.append(item.code)
+                continue
+
+            out.append(str(item))
+        return out
+
+
+class QuestionPaginatedSummaryResponse(BaseModel):
+    total_count: int
+    total_pages: int
+    current_page: int
+    items_count: int
+    has_prev: bool
+    has_next: bool
+    items: list[QuestionSummaryPublic]
+    model_config = ConfigDict(from_attributes=True)
+
+
+class QuestionPaginatedDetailResponse(BaseModel):
+    total_count: int
+    total_pages: int
+    current_page: int
+    items_count: int
+    has_prev: bool
+    has_next: bool
+    items: list[QuestionDetailPublic]
     model_config = ConfigDict(from_attributes=True)
 
 

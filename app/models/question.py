@@ -30,7 +30,7 @@ class Question(Base):
         ForeignKey("difficulties.id"), index=True
     )
 
-    question_type: Mapped["QuestionType"] = relationship(lazy="joined")
+    question_type: Mapped["QuestionType"] = relationship(lazy="raise")
     subtopic: Mapped["Subtopic"] = relationship(lazy="joined")
     difficulty: Mapped["Difficulty"] = relationship(lazy="joined")
 
@@ -40,7 +40,7 @@ class Question(Base):
     choices: Mapped[list["Choice"]] = relationship(
         back_populates="question",
         cascade="all, delete-orphan",
-        lazy="selectin",
+        lazy="raise",
         order_by="Choice.label",
     )
     contents: Mapped[list["QuestionContent"]] = relationship(
@@ -50,11 +50,8 @@ class Question(Base):
         order_by="QuestionContent.order",
     )
     question_sources: Mapped[list["QuestionSource"]] = relationship(
-        back_populates="question",
-        cascade="all, delete-orphan",
-        lazy="selectin",
-        order_by="QuestionSource.id",
+        back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
     solution: Mapped["Solution"] = relationship(
-        back_populates="question", cascade="all", uselist=False
+        back_populates="question", cascade="all", lazy="raise", uselist=False
     )

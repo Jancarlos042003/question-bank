@@ -4,9 +4,17 @@ import logging
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.question.repository import QuestionRepository
-from app.api.v1.question.schemas import QuestionCreateInput
+from app.api.v1.question.schemas import (
+    QuestionCreateInput,
+    QuestionSummaryPublic,
+    QuestionDetailPublic,
+)
 from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
-from app.core.exceptions.domain import DuplicateValueError, ForeignKeyViolationError
+from app.core.exceptions.domain import (
+    DuplicateValueError,
+    ForeignKeyViolationError,
+    ResourceNotFoundException,
+)
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
@@ -120,11 +128,11 @@ class QuestionService:
                 message="Error al crear la pregunta en la base de datos."
             ) from e
 
-    def get_all_questions(self, page: int, limit: int, include_source: bool):
+    def get_all_questions(self, page: int, limit: int, view: str):
         """Obtiene todas las preguntas."""
         try:
             questions = self.question_repository.get_questions_db(
-                page=page, limit=limit, include_source=include_source
+                page=page, limit=limit, view=view
             )
         except SQLAlchemyError as e:
             logger.exception("Error al obtener las preguntas")
@@ -132,9 +140,32 @@ class QuestionService:
 
         # Generar URLs firmadas para todas las imágenes
         for question in questions.items:
-            self._sign_question_images(question)
+            self._sign_question_images(question, view)
 
         return questions
+
+    def get_question(self, question_id: int, view: str):
+        try:
+            question = self.question_repository.get_question_db(
+                question_id=question_id, view=view
+            )
+        except SQLAlchemyError as e:
+            logger.exception("Error al obtener la pregunta con ID %s", question_id)
+            raise RetrievalError(
+                f"Error al obtener la pregunta con ID {question_id}"
+            ) from e
+
+        if not question:
+            raise ResourceNotFoundException(
+                message=f"Pregunta con ID {question_id} no encontrada."
+            )
+
+        self._sign_question_images(question, view)
+
+        if view:
+            return QuestionSummaryPublic.model_validate(question)
+
+        return QuestionDetailPublic.model_validate(question)
 
     def _generate_question_hash(
             self, contents: list[QuestionContentCreateInput]
@@ -148,18 +179,19 @@ class QuestionService:
 
         return hashlib.sha256(base.encode("utf-8")).hexdigest()
 
-    def _sign_question_images(self, question):
+    def _sign_question_images(self, question, view):
         """Genera URLs firmadas para todas las imágenes de una pregunta."""
         # Firmar imágenes en contents
         self._sign_contents(question.contents)
 
-        # Firmar imágenes en choices
-        for choice in question.choices:
-            self._sign_contents(choice.contents)
+        if view == "full":
+            # Firmar imágenes en choices
+            for choice in question.choices:
+                self._sign_contents(choice.contents)
 
-        # Firmar imágenes en solution
-        if question.solution:
-            self._sign_contents(question.solution.contents)
+            # Firmar imágenes en solution
+            if question.solution:
+                self._sign_contents(question.solution.contents)
 
     def _sign_contents(self, contents: list):
         """Firma las URLs de los contenidos de tipo imagen."""
