@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.choice.repository import ChoiceRepository
 from app.api.v1.choice.schemas import ChoicePublic, ChoiceUpdateInput
-from app.api.v1.choice_content.schemas import ContentType
 from app.core.exceptions.domain import (
     DuplicateChoiceContentError,
     ForeignKeyViolationError,
@@ -12,6 +11,7 @@ from app.core.exceptions.domain import (
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
+from app.domain.question.sign import sign_image_contents
 from app.models.choice_content import ChoiceContent
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
@@ -98,7 +98,7 @@ class ChoiceService:
             logger.exception("Error al actualizar alternativa")
             raise PersistenceError("Error al actualizar la alternativa") from e
 
-        self._sign_contents(updated_choice.contents)
+        sign_image_contents(updated_choice.contents, self.image_service.generate_signature)
         return ChoicePublic.model_validate(updated_choice)
 
     def _validate_other_correct_choice_exists(self, question_id: int, choice_id: int):
@@ -149,10 +149,3 @@ class ChoiceService:
                 f"Contenido duplicado: '{duplicated[0]}'"
             )
             raise DuplicateChoiceContentError(message)
-
-    def _sign_contents(self, contents: list):
-        for content in contents:
-            if content.type == ContentType.IMAGE:
-                content.value = self.image_service.generate_signature(
-                    storage_object_name=content.value
-                )

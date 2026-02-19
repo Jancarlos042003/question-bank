@@ -1,4 +1,3 @@
-import hashlib
 import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -14,13 +13,14 @@ from app.api.v1.question.schemas import (
     QuestionSummaryPublic,
     QuestionTypeSpecificUpdate,
 )
-from app.api.v1.question_content.schemas import ContentType, QuestionContentCreateInput
 from app.core.exceptions.domain import (
     DuplicateValueError,
     ForeignKeyViolationError,
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
+from app.domain.question.hash import generate_question_hash
+from app.domain.question.sign import sign_image_contents
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
@@ -49,7 +49,7 @@ class QuestionService:
         self.image_service = image_service
 
     async def create_question(self, question: QuestionCreateInput):
-        question_hash = self._generate_question_hash(contents=question.contents)
+        question_hash = generate_question_hash(question.contents)
 
         areas = self.area_service.get_areas(question.area_ids)
         sources_ids = [
@@ -260,36 +260,18 @@ class QuestionService:
 
         return deleted_question
 
-    def _generate_question_hash(
-            self, contents: list[QuestionContentCreateInput]
-    ) -> str:
-        base = ""
-        for i in contents:
-            if i.type == ContentType.IMAGE:
-                break
-
-            base += i.value.strip().lower()
-
-        return hashlib.sha256(base.encode("utf-8")).hexdigest()
-
     def _sign_question_images(self, question, view):
         """Genera URLs firmadas para todas las imágenes de una pregunta."""
         # Firmar imágenes en contents
-        self._sign_contents(question.contents)
+        sign_image_contents(question.contents, self.image_service.generate_signature)
 
         if view == "full":
             # Firmar imágenes en choices
             for choice in question.choices:
-                self._sign_contents(choice.contents)
+                sign_image_contents(choice.contents, self.image_service.generate_signature)
 
             # Firmar imágenes en solutions
             for solution in question.solutions:
-                self._sign_contents(solution.contents)
-
-    def _sign_contents(self, contents: list):
-        """Firma las URLs de los contenidos de tipo imagen."""
-        for content in contents:
-            if content.type == ContentType.IMAGE:
-                content.value = self.image_service.generate_signature(
-                    storage_object_name=content.value
+                sign_image_contents(
+                    solution.contents, self.image_service.generate_signature
                 )

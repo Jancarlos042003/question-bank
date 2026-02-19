@@ -4,12 +4,12 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.solution.repository import SolutionRepository
 from app.api.v1.solution.schemas import SolutionPublic, SolutionUpdateInput
-from app.api.v1.solution_content.shemas import ContentType
 from app.core.exceptions.domain import (
     ForeignKeyViolationError,
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
+from app.domain.question.sign import sign_image_contents
 from app.models.solution_content import SolutionContent
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
@@ -78,12 +78,8 @@ class SolutionService:
             logger.exception("Error al actualizar solución")
             raise PersistenceError("Error al actualizar la solución") from e
 
-        self._sign_contents(updated_solution.contents)
-        return SolutionPublic.model_validate(updated_solution)
+        sign_image_contents(
+            updated_solution.contents, self.image_service.generate_signature
+        )
 
-    def _sign_contents(self, contents: list):
-        for content in contents:
-            if content.type == ContentType.IMAGE:
-                content.value = self.image_service.generate_signature(
-                    storage_object_name=content.value
-                )
+        return SolutionPublic.model_validate(updated_solution)

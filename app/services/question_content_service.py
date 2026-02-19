@@ -1,4 +1,3 @@
-import hashlib
 import logging
 from types import SimpleNamespace
 
@@ -6,7 +5,6 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.question_content.repository import QuestionContentRepository
 from app.api.v1.question_content.schemas import (
-    ContentType,
     QuestionContentResponse,
     QuestionContentUpdateInput,
 )
@@ -16,6 +14,8 @@ from app.core.exceptions.domain import (
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
+from app.domain.question.hash import generate_question_hash
+from app.domain.question.sign import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
 
@@ -100,7 +100,7 @@ class QuestionContentService:
                 )
             )
 
-        question_hash = self._generate_question_hash(contents=projected_contents)
+        question_hash = generate_question_hash(projected_contents)
 
         try:
             updated_content = self.repository.update_question_content_db(
@@ -133,21 +133,6 @@ class QuestionContentService:
                 "Error al actualizar el contenido de la pregunta"
             ) from e
 
-        if updated_content.type == ContentType.IMAGE:
-            updated_content.value = self.image_service.generate_signature(
-                storage_object_name=updated_content.value
-            )
+        sign_image_contents([updated_content], self.image_service.generate_signature)
 
         return QuestionContentResponse.model_validate(updated_content)
-
-    def _generate_question_hash(self, contents: list) -> str:
-        ordered_contents = sorted(contents, key=lambda item: item.order)
-        base = ""
-
-        for item in ordered_contents:
-            if item.type == ContentType.IMAGE:
-                break
-
-            base += item.value.strip().lower()
-
-        return hashlib.sha256(base.encode("utf-8")).hexdigest()

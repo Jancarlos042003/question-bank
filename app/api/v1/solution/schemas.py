@@ -2,7 +2,7 @@ from typing import Annotated, List
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.api.v1.solution_content.shemas import (
+from app.api.v1.solution_content.schemas import (
     SolutionContentCreateInput,
     SolutionContentPublic,
 )
