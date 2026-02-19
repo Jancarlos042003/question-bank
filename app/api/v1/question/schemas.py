@@ -211,6 +211,38 @@ class QuestionSourcesUpdate(BaseModel):
     ]
 
 
+class QuestionTypeSpecificUpdate(BaseModel):
+    question_type_id: Annotated[
+        QuestionType,
+        Field(description="Tipo de pregunta", examples=[1]),
+    ]
+
+
+class QuestionSubtopicSpecificUpdate(BaseModel):
+    subtopic_id: Annotated[
+        int,
+        Field(gt=0, description="ID del subtema", examples=[1]),
+    ]
+
+
+class QuestionDifficultySpecificUpdate(BaseModel):
+    difficulty_id: Annotated[
+        int,
+        Field(gt=0, description="ID de la dificultad", examples=[1]),
+    ]
+
+
+class QuestionAreasSpecificUpdate(BaseModel):
+    area_ids: Annotated[
+        List[int],
+        Field(
+            min_length=1,
+            description="Lista de IDs de áreas válidas",
+            examples=[1, 2],
+        ),
+    ]
+
+
 class QuestionContentsSectionResponse(BaseModel):
     id: int
     contents: list[QuestionContentResponse]
@@ -224,6 +256,28 @@ class QuestionChoicesSectionResponse(BaseModel):
 class QuestionSolutionsSectionResponse(BaseModel):
     id: int
     solutions: list[SolutionPublic]
+
+
+class QuestionAreasSectionResponse(BaseModel):
+    id: int
+    areas: list[str]
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("areas", mode="before")
+    @classmethod
+    def flatten_areas(cls, v):
+        if v is None:
+            return []
+
+        out: list[str] = []
+        for item in v:
+            if hasattr(item, "code"):
+                out.append(item.code)
+                continue
+
+            out.append(str(item))
+        return out
 
 
 # PÚBLICO
