@@ -11,12 +11,17 @@ from app.api.v1.solution_content.shemas import (
 # PRIVADO
 class SolutionCreateInput(BaseModel):
     contents: Annotated[
-        List[SolutionContentCreateInput], Field(description="Contenido de la solución")
+        List[SolutionContentCreateInput],
+        Field(min_length=1, description="Contenido de la solución"),
     ]
 
 
 class SolutionCreate(BaseModel):
     question_id: int
+
+
+class SolutionUpdateInput(SolutionCreateInput):
+    pass
 
 
 # PÚBLICO

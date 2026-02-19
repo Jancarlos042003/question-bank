@@ -1,0 +1,80 @@
+import logging
+
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from app.api.v1.solution.repository import SolutionRepository
+from app.api.v1.solution.schemas import SolutionPublic, SolutionUpdateInput
+from app.api.v1.solution_content.shemas import ContentType
+from app.core.exceptions.domain import (
+    ForeignKeyViolationError,
+    ResourceNotFoundException,
+)
+from app.core.exceptions.technical import PersistenceError, RetrievalError
+from app.models.solution_content import SolutionContent
+from app.services.image_service import ImageService
+
+logger = logging.getLogger(__name__)
+
+
+class SolutionService:
+    def __init__(self, repository: SolutionRepository, image_service: ImageService):
+        self.repository = repository
+        self.image_service = image_service
+
+    def update_solution(
+            self,
+            question_id: int,
+            solution_id: int,
+            payload: SolutionUpdateInput,
+    ):
+        try:
+            db_solution = self.repository.get_solution_db(
+                question_id=question_id, solution_id=solution_id
+            )
+        except SQLAlchemyError as e:
+            logger.exception(
+                "Error al obtener solución %s de la pregunta %s",
+                solution_id,
+                question_id,
+            )
+            raise RetrievalError("Error al obtener la solución") from e
+
+        if not db_solution:
+            raise ResourceNotFoundException(
+                message=(
+                    f"Solución con ID {solution_id} no encontrada "
+                    f"en la pregunta con ID {question_id}."
+                )
+            )
+
+        contents = [
+            SolutionContent(type=item.type, value=item.value, order=item.order)
+            for item in payload.contents
+        ]
+
+        try:
+            updated_solution = self.repository.update_solution_db(
+                solution=db_solution, contents=contents
+            )
+        except IntegrityError as e:
+            logger.exception("IntegrityError al actualizar solución")
+            orig = getattr(e, "orig", None)
+            pgcode = getattr(orig, "pgcode", None)
+
+            if pgcode == "23503":
+                raise ForeignKeyViolationError("La clave foránea no existe") from e
+
+            raise PersistenceError("Error al actualizar la solución") from e
+        except SQLAlchemyError as e:
+            logger.exception("Error al actualizar solución")
+            raise PersistenceError("Error al actualizar la solución") from e
+
+        self._sign_contents(updated_solution.contents)
+        return SolutionPublic.model_validate(updated_solution)
+
+    def _sign_contents(self, contents: list):
+        for content in contents:
+            if content.type == ContentType.IMAGE:
+                content.value = self.image_service.generate_signature(
+                    storage_object_name=content.value
+                )
