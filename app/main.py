@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.v1.image.router import image_router
-from app.api.v1.institution.router import institution_router
-from app.api.v1.question.router import question_router
-from app.api.v1.source.router import source_router
-from app.api.v1.subtopic.router import subtopic_router
-from app.api.v1.topic.router import topic_router
+from app.api.v1.router import api_v1_router
 from app.core.exceptions.handlers import register_exception_handlers
 from app.core.logging_config import setup_logging
 from app.core.middleware import register_middleware
@@ -17,12 +12,7 @@ setup_logging()
 register_middleware(app)
 register_exception_handlers(app)
 
-app.include_router(question_router, prefix="/questions")
-app.include_router(topic_router, prefix="/topics")
-app.include_router(subtopic_router, prefix="/subtopics")
-app.include_router(institution_router, prefix="/institutions")
-app.include_router(source_router, prefix="/sources")
-app.include_router(image_router, prefix="/images")
+app.include_router(api_v1_router, prefix="/api/v1")
 
 
 @app.get("/")
