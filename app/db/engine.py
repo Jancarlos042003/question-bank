@@ -12,4 +12,12 @@ DATABASE_URL = (
     f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
 )
 
-engine = create_engine(url=DATABASE_URL, echo=True, future=True)
+engine = create_engine(
+    url=DATABASE_URL,
+    echo=True,
+    future=True,
+    pool_size=5,  # conexiones permanentes abiertas
+    max_overflow=10,  # conexiones extra en picos
+    pool_pre_ping=True,  # verifica que la conexión sigue viva
+    pool_recycle=1800,  # recicla conexiones cada 30 min
+)
