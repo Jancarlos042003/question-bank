@@ -2,10 +2,10 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.institution.repository import InstitutionRepository
 from app.api.v1.institution.schemas import InstitutionCreate, InstitutionUpdate
 from app.core.exceptions.domain import ResourceNotFoundException, DuplicateValueError
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
+from app.repositories.institution_repository import InstitutionRepository
 
 logger = logging.getLogger(__name__)
 

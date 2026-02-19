@@ -2,15 +2,15 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.solution.repository import SolutionRepository
 from app.api.v1.solution.schemas import SolutionPublic, SolutionUpdateInput
 from app.core.exceptions.domain import (
     ForeignKeyViolationError,
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
-from app.domain.question.sign import sign_image_contents
 from app.models.solution_content import SolutionContent
+from app.repositories.solution_repository import SolutionRepository
+from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
 

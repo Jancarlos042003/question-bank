@@ -2,7 +2,6 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.question.repository import QuestionRepository
 from app.api.v1.question.schemas import (
     QuestionAreasSectionResponse,
     QuestionAreasSpecificUpdate,
@@ -20,7 +19,7 @@ from app.core.exceptions.domain import (
 )
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.domain.question.hash import generate_question_hash
-from app.domain.question.sign import sign_image_contents
+from app.repositories.question_repository import QuestionRepository
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
@@ -29,6 +28,7 @@ from app.models.question_source import QuestionSource
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
 from app.services.area_service import AreaService
+from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.source_service import SourceService
 

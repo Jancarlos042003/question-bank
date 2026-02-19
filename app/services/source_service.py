@@ -2,11 +2,11 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.source.repository import SourceRepository
 from app.api.v1.source.schemas import SourceCreate, SourceUpdate
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.services.institution_service import InstitutionService
+from app.repositories.source_repository import SourceRepository
 
 logger = logging.getLogger(__name__)
 

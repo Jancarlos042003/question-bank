@@ -2,7 +2,6 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.choice.repository import ChoiceRepository
 from app.api.v1.choice.schemas import ChoicePublic, ChoiceUpdateInput
 from app.core.exceptions.domain import (
     DuplicateChoiceContentError,
@@ -11,8 +10,9 @@ from app.core.exceptions.domain import (
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
-from app.domain.question.sign import sign_image_contents
+from app.repositories.choice_repository import ChoiceRepository
 from app.models.choice_content import ChoiceContent
+from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
 

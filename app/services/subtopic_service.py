@@ -2,11 +2,11 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.subtopic.repository import SubtopicRepository
 from app.api.v1.subtopic.schemas import SubtopicCreate, SubtopicUpdate
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import PersistenceError, RetrievalError, DeleteError
 from app.services.topic_service import TopicService
+from app.repositories.subtopic_repository import SubtopicRepository
 
 logger = logging.getLogger(__name__)
 

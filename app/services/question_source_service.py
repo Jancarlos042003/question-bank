@@ -2,11 +2,11 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.question_source.repository import QuestionSourceRepository
 from app.api.v1.question_source.schemas import QuestionSourceUpdateInput
 from app.core.exceptions.domain import ForeignKeyViolationError, ResourceNotFoundException
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.services.question_guard_service import QuestionGuardService
+from app.repositories.question_source_repository import QuestionSourceRepository
 from app.services.source_service import SourceService
 
 logger = logging.getLogger(__name__)

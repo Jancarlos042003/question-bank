@@ -2,9 +2,9 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.api.v1.area.repository import AreaRepository
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import RetrievalError
+from app.repositories.area_repository import AreaRepository
 
 logger = logging.getLogger(__name__)
 

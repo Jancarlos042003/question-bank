@@ -2,7 +2,6 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.topic.repository import TopicRepository
 from app.api.v1.topic.schemas import (
     TopicCreate,
     TopicPublic,
@@ -12,6 +11,7 @@ from app.api.v1.topic.schemas import (
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import DeleteError, PersistenceError
 from app.services.course_service import CourseService
+from app.repositories.topic_repository import TopicRepository
 
 logger = logging.getLogger(__name__)
 
