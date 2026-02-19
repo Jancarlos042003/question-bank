@@ -1,15 +1,12 @@
 import math
+from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.subtopic.schemas import (
-    SubtopicCreate,
-    SubtopicPaginatedResponse,
-    SubtopicUpdate,
-)
 from app.models.subtopic import Subtopic
+from app.repositories.pagination import PaginatedResult
 
 
 class SubtopicRepository:
@@ -20,7 +17,9 @@ class SubtopicRepository:
         stmt = select(Subtopic).where(Subtopic.id == subtopic_id)
         return self.db.scalar(stmt)
 
-    def get_subtopics(self, page: int = 0, limit: int = 100):
+    def get_subtopics(
+            self, page: int = 1, limit: int = 100
+    ) -> PaginatedResult[Subtopic]:
         offset = (page - 1) * limit
 
         # OBTENEMOS SUBTEMAS
@@ -38,7 +37,7 @@ class SubtopicRepository:
         has_prev = page > 1
         has_next = page < total_pages
 
-        return SubtopicPaginatedResponse(
+        return PaginatedResult(
             total_pages=total_pages,
             total_count=total,
             current_page=page,
@@ -48,8 +47,8 @@ class SubtopicRepository:
             items=items,
         )
 
-    def create_subtopic(self, subtopic: SubtopicCreate):
-        db_subtopic = Subtopic(name=subtopic.name, topic_id=subtopic.topic_id)
+    def create_subtopic(self, subtopic_data: Mapping[str, object]):
+        db_subtopic = Subtopic(**subtopic_data)
         try:
             self.db.add(db_subtopic)
             self.db.commit()
@@ -63,15 +62,13 @@ class SubtopicRepository:
         else:
             return db_subtopic
 
-    def update_subtopic(self, subtopic_id: int, subtopic: SubtopicUpdate):
+    def update_subtopic(self, subtopic_id: int, update_data: Mapping[str, object]):
         stmt = select(Subtopic).where(Subtopic.id == subtopic_id)
         db_subtopic = self.db.scalar(stmt)
 
         if not db_subtopic:
             return None
 
-        # Actualizar los campos del subtopic
-        update_data = subtopic.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_subtopic, key, value)
 

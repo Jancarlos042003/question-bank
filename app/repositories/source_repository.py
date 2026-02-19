@@ -1,15 +1,12 @@
 import math
+from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.source.schemas import (
-    SourceCreate,
-    SourcePaginatedResponse,
-    SourceUpdate,
-)
 from app.models.source import Source
+from app.repositories.pagination import PaginatedResult
 
 
 class SourceRepository:
@@ -20,7 +17,7 @@ class SourceRepository:
         stmt = select(Source).where(Source.id == source_id)
         return self.db.scalar(stmt)
 
-    def get_sources(self, page: int, limit: int):
+    def get_sources(self, page: int, limit: int) -> PaginatedResult[Source]:
         offset = (page - 1) * limit
 
         stmt = select(Source).offset(offset).limit(limit)
@@ -32,7 +29,7 @@ class SourceRepository:
         has_prev = page > 1
         has_next = page < total_pages
 
-        return SourcePaginatedResponse(
+        return PaginatedResult(
             total_count=total_count,
             total_pages=total_pages,
             current_page=page,
@@ -46,8 +43,8 @@ class SourceRepository:
         stmt = select(Source).where(Source.id.in_(ids))
         return list(self.db.scalars(stmt).all())
 
-    def create_source(self, source: SourceCreate):
-        db_source = Source(**source.model_dump())
+    def create_source(self, source_data: Mapping[str, object]):
+        db_source = Source(**source_data)
 
         try:
             self.db.add(db_source)
@@ -61,14 +58,13 @@ class SourceRepository:
             self.db.rollback()
             raise
 
-    def update_source(self, source_id: int, source: SourceUpdate):
+    def update_source(self, source_id: int, update_data: Mapping[str, object]):
         stmt = select(Source).where(Source.id == source_id)
         db_source = self.db.scalar(stmt)
 
         if not db_source:
             return None
 
-        update_data = source.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_source, key, value)
 

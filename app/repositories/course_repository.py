@@ -1,8 +1,9 @@
+from collections.abc import Mapping
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.course.schemas import CourseCreate, CourseUpdate
 from app.models.course import Course
 
 
@@ -18,8 +19,8 @@ class CourseRepository:
         stmt = select(Course).offset(skip).limit(limit)
         return self.db.scalars(stmt).all()
 
-    def create_course(self, course: CourseCreate):
-        db_course = Course(**course.model_dump())
+    def create_course(self, course_data: Mapping[str, object]):
+        db_course = Course(**course_data)
         try:
             self.db.add(db_course)
             self.db.commit()
@@ -32,14 +33,13 @@ class CourseRepository:
             self.db.rollback()
             raise
 
-    def update_course(self, course_id: int, course: CourseUpdate):
+    def update_course(self, course_id: int, update_data: Mapping[str, object]):
         stmt = select(Course).where(Course.id == course_id)
         db_course = self.db.scalar(stmt)
 
         if not db_course:
             return None
 
-        update_data = course.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_course, key, value)
 

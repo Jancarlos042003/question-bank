@@ -1,15 +1,12 @@
 import math
+from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.institution.schemas import (
-    InstitutionCreate,
-    InstitutionPaginatedResponse,
-    InstitutionUpdate,
-)
 from app.models.institution import Institution
+from app.repositories.pagination import PaginatedResult
 
 
 class InstitutionRepository:
@@ -20,7 +17,7 @@ class InstitutionRepository:
         stmt = select(Institution).where(Institution.id == institution_id)
         return self.db.scalar(stmt)
 
-    def get_institutions(self, page: int, limit: int):
+    def get_institutions(self, page: int, limit: int) -> PaginatedResult[Institution]:
         offset = (page - 1) * limit
 
         stmt = select(Institution).offset(offset).limit(limit)
@@ -32,7 +29,7 @@ class InstitutionRepository:
         has_prev = page > 1
         has_next = page < total_pages
 
-        return InstitutionPaginatedResponse(
+        return PaginatedResult(
             total_count=total_count,
             total_pages=total_pages,
             current_page=page,
@@ -46,8 +43,8 @@ class InstitutionRepository:
         stmt = select(Institution).where(Institution.id.in_(ids))
         return list(self.db.scalars(stmt).all())
 
-    def create_institution(self, institution: InstitutionCreate):
-        db_institution = Institution(**institution.model_dump())
+    def create_institution(self, institution_data: Mapping[str, object]):
+        db_institution = Institution(**institution_data)
 
         try:
             self.db.add(db_institution)
@@ -61,14 +58,15 @@ class InstitutionRepository:
             self.db.rollback()
             raise
 
-    def update_institution(self, institution_id: int, institution: InstitutionUpdate):
+    def update_institution(
+            self, institution_id: int, update_data: Mapping[str, object]
+    ):
         stmt = select(Institution).where(Institution.id == institution_id)
         db_institution = self.db.scalar(stmt)
 
         if not db_institution:
             return None
 
-        update_data = institution.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_institution, key, value)
 

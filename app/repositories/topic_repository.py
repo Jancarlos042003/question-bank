@@ -1,11 +1,12 @@
 import math
+from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.topic.schemas import TopicCreate, TopicPaginatedResponse, TopicUpdate
 from app.models.topic import Topic
+from app.repositories.pagination import PaginatedResult
 
 
 class TopicRepository:
@@ -16,7 +17,7 @@ class TopicRepository:
         stmt = select(Topic).where(Topic.id == topic_id)
         return self.db.scalar(stmt)
 
-    def get_topics(self, page: int, limit: int):
+    def get_topics(self, page: int, limit: int) -> PaginatedResult[Topic]:
         offset = (page - 1) * limit
 
         stmt = select(Topic).offset(offset).limit(limit)
@@ -29,7 +30,7 @@ class TopicRepository:
         has_prev = page > 1
         has_next = page < total_pages
 
-        return TopicPaginatedResponse(
+        return PaginatedResult(
             total_count=total_count,
             total_pages=total_pages,
             current_page=page,
@@ -39,8 +40,8 @@ class TopicRepository:
             items=items,
         )
 
-    def create_topic(self, topic: TopicCreate):
-        db_topic = Topic(**topic.model_dump())
+    def create_topic(self, topic_data: Mapping[str, object]):
+        db_topic = Topic(**topic_data)
         try:
             self.db.add(db_topic)
             self.db.commit()
@@ -53,14 +54,13 @@ class TopicRepository:
             self.db.rollback()
             raise
 
-    def update_topic(self, topic_id: int, topic: TopicUpdate):
+    def update_topic(self, topic_id: int, update_data: Mapping[str, object]):
         stmt = select(Topic).where(Topic.id == topic_id)
         db_topic = self.db.scalar(stmt)
 
         if not db_topic:
             return None
 
-        update_data = topic.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_topic, key, value)
 
