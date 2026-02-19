@@ -32,12 +32,8 @@ class ChoiceContentCreate(ChoiceContentBase):
     choice_id: int
 
 
-class ChoiceContentResponse(ChoiceContentBase):
-    id: int
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 # PÚBLICO
 class ChoiceContentPublic(ChoiceContentBase):
+    id: int
+
     model_config = ConfigDict(from_attributes=True)
