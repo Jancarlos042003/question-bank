@@ -27,9 +27,9 @@ from app.api.v1.question_content.schemas import (
     QuestionContentUpdateInput,
 )
 from app.api.v1.question_source.schemas import (
-    QuestionSourcePublic,
     QuestionSourceUpdateInput,
 )
+from app.api.v1.question_source.repository import QuestionSourceRepository
 from app.api.v1.solution.repository import SolutionRepository
 from app.api.v1.solution.schemas import SolutionPublic, SolutionUpdateInput
 from app.api.v1.source.repository import SourceRepository
@@ -42,6 +42,7 @@ from app.services.choice_service import ChoiceService
 from app.services.image_service import ImageService
 from app.services.institution_service import InstitutionService
 from app.services.question_content_service import QuestionContentService
+from app.services.question_source_service import QuestionSourceService
 from app.services.question_service import QuestionService
 from app.services.solution_service import SolutionService
 from app.services.source_service import SourceService
@@ -113,6 +114,14 @@ def get_question_content_service(
 ) -> QuestionContentService:
     question_content_repository = QuestionContentRepository(db)
     return QuestionContentService(question_content_repository, image_service)
+
+
+def get_question_source_service(
+    db: Annotated[Session, Depends(get_session)],
+    source_service: Annotated[SourceService, Depends(get_source_service)],
+) -> QuestionSourceService:
+    question_source_repository = QuestionSourceRepository(db)
+    return QuestionSourceService(question_source_repository, source_service)
 
 
 @question_router.post(
@@ -289,11 +298,11 @@ def update_solution(
 
 @question_router.patch(
     "/{question_id}/sources/{question_source_id}",
-    response_model=QuestionSourcePublic,
+    status_code=status.HTTP_204_NO_CONTENT,
     summary="Actualizar una fuente específica de pregunta",
 )
 def update_question_source_specific(
-    service: Annotated[QuestionService, Depends(get_question_service)],
+    service: Annotated[QuestionSourceService, Depends(get_question_source_service)],
     question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
     question_source_id: Annotated[
         int, Path(ge=1, description="ID de la fuente de la pregunta")
