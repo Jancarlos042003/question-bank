@@ -42,6 +42,7 @@ from app.services.choice_service import ChoiceService
 from app.services.image_service import ImageService
 from app.services.institution_service import InstitutionService
 from app.services.question_content_service import QuestionContentService
+from app.services.question_guard_service import QuestionGuardService
 from app.services.question_source_service import QuestionSourceService
 from app.services.question_service import QuestionService
 from app.services.solution_service import SolutionService
@@ -92,36 +93,59 @@ def get_question_service(
     )
 
 
+def get_question_guard_service(
+    db: Annotated[Session, Depends(get_session)],
+) -> QuestionGuardService:
+    question_repository = QuestionRepository(db)
+    return QuestionGuardService(question_repository)
+
+
 def get_choice_service(
     db: Annotated[Session, Depends(get_session)],
     image_service: Annotated[ImageService, Depends(get_image_service)],
+    question_guard_service: Annotated[
+        QuestionGuardService, Depends(get_question_guard_service)
+    ],
 ) -> ChoiceService:
     choice_repository = ChoiceRepository(db)
-    return ChoiceService(choice_repository, image_service)
+    return ChoiceService(choice_repository, image_service, question_guard_service)
 
 
 def get_solution_service(
     db: Annotated[Session, Depends(get_session)],
     image_service: Annotated[ImageService, Depends(get_image_service)],
+    question_guard_service: Annotated[
+        QuestionGuardService, Depends(get_question_guard_service)
+    ],
 ) -> SolutionService:
     solution_repository = SolutionRepository(db)
-    return SolutionService(solution_repository, image_service)
+    return SolutionService(solution_repository, image_service, question_guard_service)
 
 
 def get_question_content_service(
     db: Annotated[Session, Depends(get_session)],
     image_service: Annotated[ImageService, Depends(get_image_service)],
+    question_guard_service: Annotated[
+        QuestionGuardService, Depends(get_question_guard_service)
+    ],
 ) -> QuestionContentService:
     question_content_repository = QuestionContentRepository(db)
-    return QuestionContentService(question_content_repository, image_service)
+    return QuestionContentService(
+        question_content_repository, image_service, question_guard_service
+    )
 
 
 def get_question_source_service(
     db: Annotated[Session, Depends(get_session)],
     source_service: Annotated[SourceService, Depends(get_source_service)],
+    question_guard_service: Annotated[
+        QuestionGuardService, Depends(get_question_guard_service)
+    ],
 ) -> QuestionSourceService:
     question_source_repository = QuestionSourceRepository(db)
-    return QuestionSourceService(question_source_repository, source_service)
+    return QuestionSourceService(
+        question_source_repository, source_service, question_guard_service
+    )
 
 
 @question_router.post(
