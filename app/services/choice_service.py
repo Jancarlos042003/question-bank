@@ -14,14 +14,21 @@ from app.core.exceptions.domain import (
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.models.choice_content import ChoiceContent
 from app.services.image_service import ImageService
+from app.services.question_guard_service import QuestionGuardService
 
 logger = logging.getLogger(__name__)
 
 
 class ChoiceService:
-    def __init__(self, repository: ChoiceRepository, image_service: ImageService):
+    def __init__(
+            self,
+            repository: ChoiceRepository,
+            image_service: ImageService,
+            question_guard_service: QuestionGuardService,
+    ):
         self.repository = repository
         self.image_service = image_service
+        self.question_guard_service = question_guard_service
 
     def update_choice(
             self,
@@ -29,6 +36,8 @@ class ChoiceService:
             choice_id: int,
             payload: ChoiceUpdateInput,
     ):
+        self.question_guard_service.ensure_exists(question_id=question_id)
+
         try:
             db_choice = self.repository.get_choice_db(
                 question_id=question_id, choice_id=choice_id
