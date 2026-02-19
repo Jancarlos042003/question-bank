@@ -2,7 +2,12 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.subtopic.schemas import SubtopicCreate, SubtopicUpdate
+from app.api.v1.subtopic.schemas import (
+    SubtopicCreate,
+    SubtopicPaginatedResponse,
+    SubtopicPublic,
+    SubtopicUpdate,
+)
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import PersistenceError, RetrievalError, DeleteError
 from app.services.topic_service import TopicService
@@ -33,12 +38,25 @@ class SubtopicService:
 
     def get_subtopics(self, page: int, limit: int):
         try:
-            return self.repository.get_subtopics(page, limit)
+            subtopics_page = self.repository.get_subtopics(page, limit)
         except SQLAlchemyError as e:
             logger.exception(f"Error al listar subtemas (page={page}, limit={limit})")
             raise RetrievalError(
                 f"Error al listar subtemas (page={page}, limit={limit})"
             ) from e
+
+        items = [
+            SubtopicPublic.model_validate(subtopic) for subtopic in subtopics_page.items
+        ]
+        return SubtopicPaginatedResponse(
+            total_count=subtopics_page.total_count,
+            total_pages=subtopics_page.total_pages,
+            current_page=subtopics_page.current_page,
+            items_count=subtopics_page.items_count,
+            has_prev=subtopics_page.has_prev,
+            has_next=subtopics_page.has_next,
+            items=items,
+        )
 
     def create_subtopic(self, subtopic: SubtopicCreate):
         # Validar que el ID de topic (FK) exista
@@ -47,7 +65,7 @@ class SubtopicService:
         )
 
         try:
-            new_subtopic = self.repository.create_subtopic(subtopic)
+            new_subtopic = self.repository.create_subtopic(subtopic.model_dump())
         except IntegrityError as e:
             logger.exception("IntegrityError al crear subtema")
             raise PersistenceError("Error al persistir el subtema") from e
@@ -64,7 +82,9 @@ class SubtopicService:
         )
 
         try:
-            updated_subtopic = self.repository.update_subtopic(subtopic_id, subtopic)
+            updated_subtopic = self.repository.update_subtopic(
+                subtopic_id, subtopic.model_dump(exclude_unset=True)
+            )
         except IntegrityError as e:
             logger.exception("IntegrityError al actualizar subtema")
             raise PersistenceError("Error al actualizar el subtema") from e

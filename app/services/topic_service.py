@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.topic.schemas import (
     TopicCreate,
+    TopicPaginatedResponse,
     TopicPublic,
     TopicPublicNoDescription,
     TopicUpdate,
@@ -46,19 +47,30 @@ class TopicService:
 
     def get_topics(self, page: int, limit: int):
         try:
-            return self.repository.get_topics(page, limit)
+            topics_page = self.repository.get_topics(page, limit)
         except SQLAlchemyError as e:
             logger.error(
                 f"Error al listar tópicos desde la base de datos (page={page}, limit={limit}): {e}"
             )
             raise PersistenceError("Error al listar los tópicos desde la base de datos")
 
+        items = [TopicPublic.model_validate(topic) for topic in topics_page.items]
+        return TopicPaginatedResponse(
+            total_count=topics_page.total_count,
+            total_pages=topics_page.total_pages,
+            current_page=topics_page.current_page,
+            items_count=topics_page.items_count,
+            has_prev=topics_page.has_prev,
+            has_next=topics_page.has_next,
+            items=items,
+        )
+
     def create_topic(self, topic: TopicCreate):
         # Validar que el ID de curso (FK) exista
         self.course_service.get_course(topic.course_id)
 
         try:
-            new_topic = self.repository.create_topic(topic)
+            new_topic = self.repository.create_topic(topic.model_dump())
         except IntegrityError as e:
             logger.error(
                 f"Error al crear el tema (course_id={topic.course_id,}): {e}",
@@ -75,7 +87,9 @@ class TopicService:
         self.course_service.get_course(topic.course_id)
 
         try:
-            updated_topic = self.repository.update_topic(topic_id, topic)
+            updated_topic = self.repository.update_topic(
+                topic_id, topic.model_dump(exclude_unset=True)
+            )
         except IntegrityError as e:
             logger.error(f"Error al actualizar el tema con id {topic_id}: {e}")
             raise PersistenceError("Error al actualizar el tema en la base de datos")

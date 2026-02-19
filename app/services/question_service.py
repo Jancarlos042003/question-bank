@@ -6,6 +6,8 @@ from app.api.v1.question.schemas import (
     QuestionAreasSectionResponse,
     QuestionAreasSpecificUpdate,
     QuestionCreateInput,
+    QuestionPaginatedDetailResponse,
+    QuestionPaginatedSummaryResponse,
     QuestionDetailPublic,
     QuestionDifficultySpecificUpdate,
     QuestionSubtopicSpecificUpdate,
@@ -19,7 +21,6 @@ from app.core.exceptions.domain import (
 )
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.domain.question.hash import generate_question_hash
-from app.repositories.question_repository import QuestionRepository
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
@@ -27,6 +28,7 @@ from app.models.question_content import QuestionContent
 from app.models.question_source import QuestionSource
 from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
+from app.repositories.question_repository import QuestionRepository
 from app.services.area_service import AreaService
 from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
@@ -139,7 +141,7 @@ class QuestionService:
     def get_all_questions(self, page: int, limit: int, view: str):
         """Obtiene todas las preguntas."""
         try:
-            questions = self.question_repository.get_questions_db(
+            questions_page = self.question_repository.get_questions_db(
                 page=page, limit=limit, view=view
             )
         except SQLAlchemyError as e:
@@ -147,10 +149,37 @@ class QuestionService:
             raise RetrievalError("Error al obtener las preguntas") from e
 
         # Generar URLs firmadas para todas las imágenes
-        for question in questions.items:
+        for question in questions_page.items:
             self._sign_question_images(question, view)
 
-        return questions
+        if view == "summary":
+            items = [
+                QuestionSummaryPublic.model_validate(question)
+                for question in questions_page.items
+            ]
+            return QuestionPaginatedSummaryResponse(
+                total_count=questions_page.total_count,
+                total_pages=questions_page.total_pages,
+                current_page=questions_page.current_page,
+                items_count=questions_page.items_count,
+                has_prev=questions_page.has_prev,
+                has_next=questions_page.has_next,
+                items=items,
+            )
+
+        items = [
+            QuestionDetailPublic.model_validate(question)
+            for question in questions_page.items
+        ]
+        return QuestionPaginatedDetailResponse(
+            total_count=questions_page.total_count,
+            total_pages=questions_page.total_pages,
+            current_page=questions_page.current_page,
+            items_count=questions_page.items_count,
+            has_prev=questions_page.has_prev,
+            has_next=questions_page.has_next,
+            items=items,
+        )
 
     def get_question(self, question_id: int, view: str):
         try:
@@ -268,7 +297,9 @@ class QuestionService:
         if view == "full":
             # Firmar imágenes en choices
             for choice in question.choices:
-                sign_image_contents(choice.contents, self.image_service.generate_signature)
+                sign_image_contents(
+                    choice.contents, self.image_service.generate_signature
+                )
 
             # Firmar imágenes en solutions
             for solution in question.solutions:

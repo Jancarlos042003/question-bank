@@ -2,7 +2,12 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.source.schemas import SourceCreate, SourceUpdate
+from app.api.v1.source.schemas import (
+    SourceCreate,
+    SourcePaginatedResponse,
+    SourcePublic,
+    SourceUpdate,
+)
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.services.institution_service import InstitutionService
@@ -36,10 +41,21 @@ class SourceService:
 
     def get_sources(self, page: int, limit: int):
         try:
-            return self.repository.get_sources(page, limit)
+            sources_page = self.repository.get_sources(page, limit)
         except SQLAlchemyError as e:
             logger.exception(f"Error al listar fuentes (page={page}, limit={limit})")
             raise RetrievalError("Error al listar fuentes") from e
+
+        items = [SourcePublic.model_validate(source) for source in sources_page.items]
+        return SourcePaginatedResponse(
+            total_count=sources_page.total_count,
+            total_pages=sources_page.total_pages,
+            current_page=sources_page.current_page,
+            items_count=sources_page.items_count,
+            has_prev=sources_page.has_prev,
+            has_next=sources_page.has_next,
+            items=items,
+        )
 
     def get_sources_by_ids(self, ids: list[int]):
         try:
@@ -62,7 +78,7 @@ class SourceService:
         self.institution_service.get_institution(source.institution_id)
 
         try:
-            return self.repository.create_source(source)
+            return self.repository.create_source(source.model_dump())
         except IntegrityError as e:
             logger.exception("IntegrityError al crear fuente")
             raise PersistenceError("Error al crear la fuente") from e
@@ -75,7 +91,9 @@ class SourceService:
             self.institution_service.get_institution(source.institution_id)
 
         try:
-            updated_source = self.repository.update_source(source_id, source)
+            updated_source = self.repository.update_source(
+                source_id, source.model_dump(exclude_unset=True)
+            )
         except IntegrityError as e:
             logger.exception("IntegrityError al actualizar fuente")
             raise PersistenceError("Error al actualizar la fuente") from e

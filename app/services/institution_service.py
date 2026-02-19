@@ -2,7 +2,12 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.api.v1.institution.schemas import InstitutionCreate, InstitutionUpdate
+from app.api.v1.institution.schemas import (
+    InstitutionCreate,
+    InstitutionPaginatedResponse,
+    InstitutionPublic,
+    InstitutionUpdate,
+)
 from app.core.exceptions.domain import ResourceNotFoundException, DuplicateValueError
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.repositories.institution_repository import InstitutionRepository
@@ -32,12 +37,26 @@ class InstitutionService:
 
     def get_institutions(self, page: int, limit: int):
         try:
-            return self.repository.get_institutions(page, limit)
+            institutions_page = self.repository.get_institutions(page, limit)
         except SQLAlchemyError as e:
             logger.exception(
                 f"Error al listar instituciones (page={page}, limit={limit})"
             )
             raise RetrievalError("Error al listar instituciones") from e
+
+        items = [
+            InstitutionPublic.model_validate(institution)
+            for institution in institutions_page.items
+        ]
+        return InstitutionPaginatedResponse(
+            total_count=institutions_page.total_count,
+            total_pages=institutions_page.total_pages,
+            current_page=institutions_page.current_page,
+            items_count=institutions_page.items_count,
+            has_prev=institutions_page.has_prev,
+            has_next=institutions_page.has_next,
+            items=items,
+        )
 
     def get_institutions_by_ids(self, ids: list[int]):
         try:
@@ -58,7 +77,7 @@ class InstitutionService:
 
     def create_institution(self, institution: InstitutionCreate):
         try:
-            return self.repository.create_institution(institution)
+            return self.repository.create_institution(institution.model_dump())
         except IntegrityError as e:
             logger.exception("IntegrityError al crear institución")
 
@@ -76,7 +95,7 @@ class InstitutionService:
     def update_institution(self, institution_id: int, institution: InstitutionUpdate):
         try:
             updated_institution = self.repository.update_institution(
-                institution_id, institution
+                institution_id, institution.model_dump(exclude_unset=True)
             )
         except IntegrityError as e:
             logger.exception("IntegrityError al actualizar institución")
