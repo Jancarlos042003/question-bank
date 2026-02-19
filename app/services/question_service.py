@@ -287,8 +287,6 @@ class QuestionService:
                 message=f"Pregunta con ID {question_id} no encontrada."
             )
 
-        return deleted_question
-
     def _sign_question_images(self, question, view):
         """Genera URLs firmadas para todas las imágenes de una pregunta."""
         # Firmar imágenes en contents

@@ -1,6 +1,6 @@
 import math
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
 
@@ -92,18 +92,17 @@ class QuestionRepository:
 
         return self.db.scalar(stmt)
 
-    def delete_question_db(self, question_id: int):
-        stmt = select(Question).where(Question.id == question_id)
-        db_question = self.db.scalar(stmt)
-
-        if not db_question:
-            return None
+    def delete_question_db(self, question_id: int) -> bool:
+        stmt = delete(Question).where(Question.id == question_id).returning(Question.id)
 
         try:
-            self.db.delete(db_question)
+            deleted_id = self.db.execute(stmt).scalar_one_or_none()
+            if deleted_id is None:
+                return False
+
             self.db.commit()
             invalidate_count_cache()
-            return db_question
+            return True
         except SQLAlchemyError:
             self.db.rollback()
             raise

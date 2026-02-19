@@ -33,8 +33,8 @@ from app.api.v1.question_source.schemas import (
 from app.api.v1.solution.schemas import SolutionPublic, SolutionUpdateInput
 from app.services.choice_service import ChoiceService
 from app.services.question_content_service import QuestionContentService
-from app.services.question_source_service import QuestionSourceService
 from app.services.question_service import QuestionService
+from app.services.question_source_service import QuestionSourceService
 from app.services.solution_service import SolutionService
 
 question_router = APIRouter(tags=["Question"])
@@ -44,8 +44,8 @@ question_router = APIRouter(tags=["Question"])
     "", response_model=QuestionCreateResponse, status_code=status.HTTP_201_CREATED
 )
 async def add_question(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question: QuestionCreateInput,
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question: QuestionCreateInput,
 ):
     """Endpoint para crear una nueva pregunta."""
 
@@ -60,15 +60,15 @@ async def add_question(
     summary="Listar preguntas",
 )
 def get_questions(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    page: Annotated[int, Query(ge=1, description="Página actual")] = 1,
-    limit: Annotated[
-        int, Query(ge=1, le=100, description="Cantidad de preguntas por página")
-    ] = 15,
-    view: Annotated[
-        Literal["summary", "full"],
-        Query(description="Nivel de detalle de la pregunta."),
-    ] = "full",
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        page: Annotated[int, Query(ge=1, description="Página actual")] = 1,
+        limit: Annotated[
+            int, Query(ge=1, le=100, description="Cantidad de preguntas por página")
+        ] = 15,
+        view: Annotated[
+            Literal["summary", "full"],
+            Query(description="Nivel de detalle de la pregunta."),
+        ] = "full",
 ):
     """
     Este endpoint recupera preguntas de la base de datos con soporte para paginación.
@@ -86,12 +86,12 @@ def get_questions(
     summary="Obtener una pregunta",
 )
 def get_question(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    view: Annotated[
-        Literal["summary", "full"],
-        Query(description="Nivel de detalle de la pregunta."),
-    ] = "full",
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        view: Annotated[
+            Literal["summary", "full"],
+            Query(description="Nivel de detalle de la pregunta."),
+        ] = "full",
 ):
     """
     Obtener una pregunta por su ID.
@@ -109,9 +109,9 @@ def get_question(
     summary="Actualizar tipo de pregunta",
 )
 def update_question_type_specific(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    payload: QuestionTypeSpecificUpdate,
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        payload: QuestionTypeSpecificUpdate,
 ):
     """Actualiza el tipo de una pregunta."""
     return service.update_question_type(question_id=question_id, payload=payload)
@@ -123,9 +123,9 @@ def update_question_type_specific(
     summary="Actualizar subtema de pregunta",
 )
 def update_question_subtopic_specific(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    payload: QuestionSubtopicSpecificUpdate,
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        payload: QuestionSubtopicSpecificUpdate,
 ):
     """Actualiza el subtema de una pregunta."""
     return service.update_question_subtopic(question_id=question_id, payload=payload)
@@ -137,9 +137,9 @@ def update_question_subtopic_specific(
     summary="Actualizar dificultad de pregunta",
 )
 def update_question_difficulty_specific(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    payload: QuestionDifficultySpecificUpdate,
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        payload: QuestionDifficultySpecificUpdate,
 ):
     """Actualiza la dificultad de una pregunta."""
     return service.update_question_difficulty(question_id=question_id, payload=payload)
@@ -151,9 +151,9 @@ def update_question_difficulty_specific(
     summary="Actualizar áreas de pregunta",
 )
 def update_question_areas_specific(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    payload: QuestionAreasSpecificUpdate,
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        payload: QuestionAreasSpecificUpdate,
 ):
     """Actualiza las áreas de una pregunta."""
     return service.update_question_areas(question_id=question_id, payload=payload)
@@ -165,10 +165,10 @@ def update_question_areas_specific(
     summary="Actualizar un contenido específico de una pregunta",
 )
 def update_question_content(
-    service: Annotated[QuestionContentService, Depends(get_question_content_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    content_id: Annotated[int, Path(ge=1, description="ID del contenido")],
-    payload: QuestionContentUpdateInput,
+        service: Annotated[QuestionContentService, Depends(get_question_content_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        content_id: Annotated[int, Path(ge=1, description="ID del contenido")],
+        payload: QuestionContentUpdateInput,
 ):
     """Actualiza un contenido específico de una pregunta."""
     return service.update_question_content(
@@ -184,10 +184,10 @@ def update_question_content(
     summary="Actualizar una alternativa específica",
 )
 def update_choice(
-    service: Annotated[ChoiceService, Depends(get_choice_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    choice_id: Annotated[int, Path(ge=1, description="ID de la alternativa")],
-    payload: ChoiceUpdateInput,
+        service: Annotated[ChoiceService, Depends(get_choice_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        choice_id: Annotated[int, Path(ge=1, description="ID de la alternativa")],
+        payload: ChoiceUpdateInput,
 ):
     """Actualiza una alternativa específica de una pregunta."""
     return service.update_choice(
@@ -201,10 +201,10 @@ def update_choice(
     summary="Actualizar una solución específica",
 )
 def update_solution(
-    service: Annotated[SolutionService, Depends(get_solution_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    solution_id: Annotated[int, Path(ge=1, description="ID de la solución")],
-    payload: SolutionUpdateInput,
+        service: Annotated[SolutionService, Depends(get_solution_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        solution_id: Annotated[int, Path(ge=1, description="ID de la solución")],
+        payload: SolutionUpdateInput,
 ):
     """Actualiza una solución específica de una pregunta."""
     return service.update_solution(
@@ -218,12 +218,12 @@ def update_solution(
     summary="Actualizar una fuente específica de pregunta",
 )
 def update_question_source_specific(
-    service: Annotated[QuestionSourceService, Depends(get_question_source_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
-    question_source_id: Annotated[
-        int, Path(ge=1, description="ID de la fuente de la pregunta")
-    ],
-    payload: QuestionSourceUpdateInput,
+        service: Annotated[QuestionSourceService, Depends(get_question_source_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        question_source_id: Annotated[
+            int, Path(ge=1, description="ID de la fuente de la pregunta")
+        ],
+        payload: QuestionSourceUpdateInput,
 ):
     """Actualiza una fuente específica de una pregunta."""
     return service.update_question_source_specific(
@@ -237,8 +237,9 @@ def update_question_source_specific(
     summary="Eliminar una pregunta",
 )
 def delete_question(
-    service: Annotated[QuestionService, Depends(get_question_service)],
-    question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
+        service: Annotated[QuestionService, Depends(get_question_service)],
+        question_id: Annotated[int, Path(ge=1, description="ID de la pregunta")],
 ):
     """Elimina una pregunta por su ID."""
-    return service.delete_question(question_id=question_id)
+    service.delete_question(question_id=question_id)
+    return None
