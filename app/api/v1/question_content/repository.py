@@ -11,7 +11,6 @@ class QuestionContentRepository:
         self.db = db
 
     def get_question_content_db(self, question_id: int, content_id: int):
-        """Obtiene un contenido específico de una pregunta por su ID y el ID de la pregunta."""
         stmt = select(QuestionContent).where(
             QuestionContent.id == content_id,
             QuestionContent.question_id == question_id,

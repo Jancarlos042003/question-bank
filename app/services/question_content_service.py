@@ -1,5 +1,6 @@
 import hashlib
 import logging
+from types import SimpleNamespace
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -16,6 +17,7 @@ from app.core.exceptions.domain import (
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.services.image_service import ImageService
+from app.services.question_guard_service import QuestionGuardService
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +27,11 @@ class QuestionContentService:
             self,
             repository: QuestionContentRepository,
             image_service: ImageService,
+            question_guard_service: QuestionGuardService,
     ):
         self.repository = repository
         self.image_service = image_service
+        self.question_guard_service = question_guard_service
 
     def update_question_content(
             self,
@@ -35,9 +39,12 @@ class QuestionContentService:
             content_id: int,
             payload: QuestionContentUpdateInput,
     ):
+        self.question_guard_service.ensure_exists(question_id=question_id)
+
         try:
             db_content = self.repository.get_question_content_db(
-                question_id=question_id, content_id=content_id
+                question_id=question_id,
+                content_id=content_id,
             )
         except SQLAlchemyError as e:
             logger.exception(
@@ -56,7 +63,6 @@ class QuestionContentService:
             )
 
         try:
-            # Obtener todos los contents para recalcular `question_hash`
             contents = self.repository.get_question_contents_db(question_id=question_id)
         except SQLAlchemyError as e:
             logger.exception(
@@ -64,21 +70,37 @@ class QuestionContentService:
             )
             raise RetrievalError("Error al obtener contenidos de la pregunta") from e
 
+        # Se usa para generar un hash de la pregunta y detectar duplicados antes de persistir
+        projected_contents = []
         for content in contents:
-            if content.id != content_id:
+            if content.id == content_id:
+                projected_contents.append(
+                    # Simulamos el objeto QuestionContent
+                    SimpleNamespace(
+                        type=payload.type if payload.type is not None else content.type,
+                        value=(
+                            payload.value
+                            if payload.value is not None
+                            else content.value
+                        ),
+                        order=(
+                            payload.order
+                            if payload.order is not None
+                            else content.order
+                        ),
+                    )
+                )
                 continue
 
-            if payload.label is not None:
-                content.label = payload.label
-            if payload.type is not None:
-                content.type = payload.type
-            if payload.value is not None:
-                content.value = payload.value
-            if payload.order is not None:
-                content.order = payload.order
-            break
+            projected_contents.append(
+                SimpleNamespace(
+                    type=content.type,
+                    value=content.value,
+                    order=content.order,
+                )
+            )
 
-        question_hash = self._generate_question_hash(contents=contents)
+        question_hash = self._generate_question_hash(contents=projected_contents)
 
         try:
             updated_content = self.repository.update_question_content_db(
