@@ -74,7 +74,6 @@ def get_question_service(
     "", response_model=QuestionCreateResponse, status_code=status.HTTP_201_CREATED
 )
 async def add_question(
-        db: Annotated[Session, Depends(get_session)],
         service: Annotated[QuestionService, Depends(get_question_service)],
         question: QuestionCreateInput,
 ):
