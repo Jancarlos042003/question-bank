@@ -32,12 +32,8 @@ class SolutionContentCreate(SolutionContentBase):
     solution_id: int
 
 
-class SolutionContentRespo(SolutionContentBase):
-    id: int
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 # PÚBLICO
 class SolutionContentPublic(SolutionContentBase):
+    id: int
+
     model_config = ConfigDict(from_attributes=True)
