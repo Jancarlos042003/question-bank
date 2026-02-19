@@ -1,11 +1,7 @@
 import hashlib
-from enum import StrEnum
 from typing import Iterable, Protocol
 
-
-class ContentType(StrEnum):
-    TEXT = "text"
-    IMAGE = "image"
+from app.domain.content_type import ContentType
 
 
 class QuestionHashContent(Protocol):

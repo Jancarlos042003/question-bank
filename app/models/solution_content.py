@@ -1,18 +1,13 @@
-from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.domain.content_type import ContentType
 
 if TYPE_CHECKING:
     from app.models.solution import Solution
-
-
-class ContentType(StrEnum):
-    TEXT = "text"
-    IMAGE = "image"
 
 
 class SolutionContent(Base):

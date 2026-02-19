@@ -1,12 +1,8 @@
-from enum import StrEnum
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class ContentType(StrEnum):
-    TEXT = "text"
-    IMAGE = "image"
+from app.domain.content_type import ContentType
 
 
 class SolutionContentBase(BaseModel):
