@@ -10,7 +10,9 @@ class Solution(Base):
     __tablename__ = "solutions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"), index=True)
+    question_id: Mapped[int] = mapped_column(
+        ForeignKey("questions.id", ondelete="CASCADE"), index=True
+    )
 
     contents: Mapped[list["SolutionContent"]] = relationship(
         back_populates="solution", cascade="all, delete-orphan", lazy="selectin"
