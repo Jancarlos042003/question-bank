@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.api.v1.choice_content.schemas import (
     ChoiceContentCreateInput,
@@ -33,6 +33,39 @@ class ChoiceCreateInput(ChoiceBase):
 
 class ChoiceCreate(ChoiceBase):
     question_id: int
+
+
+class ChoiceUpdateInput(BaseModel):
+    label: Annotated[
+        str | None,
+        Field(
+            default=None,
+            max_length=1,
+            description="Etiqueta de la opción",
+            examples=["A"],
+        ),
+    ]
+    is_correct: Annotated[
+        bool | None,
+        Field(default=None, description="Indica si la opción es correcta"),
+    ]
+    contents: Annotated[
+        List[ChoiceContentCreateInput] | None,
+        Field(default=None, min_length=1, description="Contenido de la opción"),
+    ]
+
+    @model_validator(mode="after")
+    def validate_any_field_present(self):
+        if (
+            self.label is None
+            and self.is_correct is None
+            and self.contents is None
+        ):
+            raise ValueError(
+                "Debes enviar al menos un campo para actualizar la alternativa."
+            )
+
+        return self
 
 
 # PÚBLICO
