@@ -56,11 +56,7 @@ class ChoiceUpdateInput(BaseModel):
 
     @model_validator(mode="after")
     def validate_any_field_present(self):
-        if (
-            self.label is None
-            and self.is_correct is None
-            and self.contents is None
-        ):
+        if self.label is None and self.is_correct is None and self.contents is None:
             raise ValueError(
                 "Debes enviar al menos un campo para actualizar la alternativa."
             )
@@ -70,6 +66,7 @@ class ChoiceUpdateInput(BaseModel):
 
 # PÚBLICO
 class ChoicePublic(BaseModel):
+    id: int
     is_correct: bool
     label: Annotated[str, Field(description="Etiqueta de la opción", examples=["A"])]
     contents: List[ChoiceContentPublic]
