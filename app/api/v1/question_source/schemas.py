@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.v1.source.schemas import SourceSimplePublic
 
@@ -8,6 +8,17 @@ from app.api.v1.source.schemas import SourceSimplePublic
 class QuestionSourceCreateInput(BaseModel):
     source_id: Annotated[int, Field(gt=0, description="ID de la fuente", examples=[1])]
     page: Annotated[int, Field(gt=0, description="Página de referencia", examples=[23])]
+
+
+class QuestionSourceUpdateInput(BaseModel):
+    source_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="ID de la fuente", examples=[1]),
+    ]
+    page: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="Página de referencia", examples=[23]),
+    ]
 
 
 class QuestionSourcePublic(BaseModel):
