@@ -5,12 +5,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.v1.question.schemas import (
-    QuestionSummaryPublic,
-    QuestionPaginatedSummaryResponse,
     QuestionDetailPublic,
     QuestionPaginatedDetailResponse,
+    QuestionPaginatedSummaryResponse,
+    QuestionSummaryPublic,
 )
-from app.core.cache import get_cached_count, set_cached_count
+from app.core.cache import get_cached_count, invalidate_count_cache, set_cached_count
 from app.models.choice import Choice
 from app.models.question import Question
 from app.models.solution import Solution
@@ -107,3 +107,41 @@ class QuestionRepository:
             )
 
         return self.db.scalar(stmt)
+
+    def delete_question_db(self, question_id: int):
+        stmt = select(Question).where(Question.id == question_id)
+        db_question = self.db.scalar(stmt)
+
+        if not db_question:
+            return None
+
+        try:
+            self.db.delete(db_question)
+            self.db.commit()
+            invalidate_count_cache()
+            return db_question
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
+
+    def question_exists_db(self, question_id: int) -> bool:
+        stmt = select(Question.id).where(Question.id == question_id)
+        return self.db.scalar(stmt) is not None
+
+    def update_question_fields_db(self, question_id: int, update_data: dict):
+        stmt = select(Question).where(Question.id == question_id)
+        db_question = self.db.scalar(stmt)
+
+        if not db_question:
+            return None
+
+        for key, value in update_data.items():
+            setattr(db_question, key, value)
+
+        try:
+            self.db.commit()
+            self.db.refresh(db_question)
+            return db_question
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
