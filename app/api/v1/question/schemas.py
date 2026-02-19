@@ -9,8 +9,10 @@ from app.api.v1.question_content.schemas import (
     QuestionContentCreateInput,
     QuestionContentResponse,
 )
-from app.api.v1.question_source.schemas import QuestionSourceCreateInput
-from app.api.v1.question_source.schemas import QuestionSourcePublic
+from app.api.v1.question_source.schemas import (
+    QuestionSourceCreateInput,
+    QuestionSourcePublic,
+)
 from app.api.v1.question_type.schemas import QuestionTypeCodeOnly
 from app.api.v1.solution.schemas import SolutionCreateInput, SolutionPublic
 from app.api.v1.subtopic.schemas import SubtopicSimplePublic
@@ -79,7 +81,9 @@ class QuestionCreateInput(QuestionBase):
     @field_validator("choices")
     @classmethod
     def validate_single_correct(cls, choices: List[ChoiceCreateInput]):
-        """Valida que exista exactamente una alternativa marcada como correcta (true)."""
+        """
+        Valida que exista exactamente una alternativa marcada como correcta (true).
+        """
         correct = sum(1 for c in choices if c.is_correct)
 
         if correct == 0:
@@ -102,13 +106,124 @@ class QuestionCreateInput(QuestionBase):
                 normalized = content.value.strip().lower()
 
                 if normalized in unique_choices:
+                    message = (
+                        "Las respuestas deben ser únicas. "
+                        f"Contenido duplicado: '{normalized}'"
+                    )
                     raise DuplicateChoiceContentError(
-                        f"Las respuestas deben ser únicas. Contenido duplicado: '{normalized}'"
+                        message
                     )
 
                 unique_choices.add(normalized)
 
         return choices
+
+
+class QuestionUpdate(BaseModel):
+    question_type_id: Annotated[
+        QuestionType | None,
+        Field(
+            default=None,
+            description="Tipo de pregunta",
+            examples=[1],
+        ),
+    ]
+    subtopic_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="ID del subtema", examples=[1]),
+    ]
+    difficulty_id: Annotated[
+        int | None,
+        Field(default=None, gt=0, description="ID de la dificultad", examples=[1]),
+    ]
+    area_ids: Annotated[
+        List[int] | None,
+        Field(
+            default=None,
+            min_length=1,
+            description="Lista de IDs de áreas válidas",
+            examples=[1, 2, 3],
+        ),
+    ]
+
+
+class QuestionContentsUpdate(BaseModel):
+    contents: Annotated[
+        List[QuestionContentCreateInput],
+        Field(min_length=1, description="Contenido de la pregunta"),
+    ]
+
+
+class QuestionChoicesUpdate(BaseModel):
+    choices: Annotated[
+        List[ChoiceCreateInput],
+        Field(min_length=4, max_length=5, description="Alternativas de la pregunta"),
+    ]
+
+    @field_validator("choices")
+    @classmethod
+    def validate_single_correct(cls, choices: List[ChoiceCreateInput]):
+        correct = sum(1 for c in choices if c.is_correct)
+
+        if correct == 0:
+            raise NoCorrectChoiceError("Debe existir al menos una alternativa correcta")
+        if correct > 1:
+            raise MultipleCorrectChoicesError(
+                "Debe existir exactamente una alternativa correcta"
+            )
+
+        return choices
+
+    @field_validator("choices")
+    @classmethod
+    def validate_unique_responses(cls, choices: List[ChoiceCreateInput]):
+        unique_choices = set()
+
+        for c in choices:
+            for content in c.contents:
+                normalized = content.value.strip().lower()
+
+                if normalized in unique_choices:
+                    message = (
+                        "Las respuestas deben ser únicas. "
+                        f"Contenido duplicado: '{normalized}'"
+                    )
+                    raise DuplicateChoiceContentError(
+                        message
+                    )
+
+                unique_choices.add(normalized)
+
+        return choices
+
+
+class QuestionSolutionsUpdate(BaseModel):
+    solutions: Annotated[
+        List[SolutionCreateInput],
+        Field(min_length=1, description="Soluciones de la pregunta"),
+    ]
+
+
+class QuestionSourcesUpdate(BaseModel):
+    sources: Annotated[
+        List[QuestionSourceCreateInput],
+        Field(min_length=1, description="Lista de fuentes asociadas a la pregunta"),
+    ]
+
+
+class QuestionContentsSectionResponse(BaseModel):
+    id: int
+    contents: list[QuestionContentResponse]
+
+
+class QuestionChoicesSectionResponse(BaseModel):
+    id: int
+    choices: list[ChoicePublic]
+
+
+class QuestionSolutionsSectionResponse(BaseModel):
+    id: int
+    solutions: list[SolutionPublic]
 
 
 # PÚBLICO
