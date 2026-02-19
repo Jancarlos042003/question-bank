@@ -3,8 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.v1.institution.repository import InstitutionRepository
-from app.api.v1.source.repository import SourceRepository
 from app.api.v1.source.schemas import (
     SourceCreate,
     SourcePaginatedResponse,
@@ -12,6 +10,8 @@ from app.api.v1.source.schemas import (
     SourceUpdate,
 )
 from app.db.session import get_session
+from app.repositories.institution_repository import InstitutionRepository
+from app.repositories.source_repository import SourceRepository
 from app.services.institution_service import InstitutionService
 from app.services.source_service import SourceService
 

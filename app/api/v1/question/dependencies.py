@@ -3,20 +3,18 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.db.repositories import (
-    AreaRepository,
-    ChoiceRepository,
-    InstitutionRepository,
-    QuestionContentRepository,
-    QuestionRepository,
-    QuestionSourceRepository,
-    SolutionRepository,
-    SourceRepository,
-)
 from app.core.config import settings
 from app.db.session import get_session
 from app.infrastructure.gcp.storage_adapter import GCPStorageAdapter
 from app.ports.storage_port import StoragePort
+from app.repositories.area_repository import AreaRepository
+from app.repositories.choice_repository import ChoiceRepository
+from app.repositories.institution_repository import InstitutionRepository
+from app.repositories.question_content_repository import QuestionContentRepository
+from app.repositories.question_repository import QuestionRepository
+from app.repositories.question_source_repository import QuestionSourceRepository
+from app.repositories.solution_repository import SolutionRepository
+from app.repositories.source_repository import SourceRepository
 from app.services.area_service import AreaService
 from app.services.choice_service import ChoiceService
 from app.services.image_service import ImageService

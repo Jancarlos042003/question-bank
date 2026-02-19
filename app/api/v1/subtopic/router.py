@@ -3,15 +3,15 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.v1.subtopic.repository import SubtopicRepository
 from app.api.v1.subtopic.schemas import (
     SubtopicCreate,
     SubtopicPaginatedResponse,
     SubtopicPublic,
     SubtopicUpdate,
 )
-from app.api.v1.topic.repository import TopicRepository
 from app.db.session import get_session
+from app.repositories.subtopic_repository import SubtopicRepository
+from app.repositories.topic_repository import TopicRepository
 from app.services.subtopic_service import SubtopicService
 from app.services.topic_service import TopicService
 

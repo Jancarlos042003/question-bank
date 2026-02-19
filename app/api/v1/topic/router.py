@@ -3,8 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.v1.course.repository import CourseRepository
-from app.api.v1.topic.repository import TopicRepository
 from app.api.v1.topic.schemas import (
     TopicCreate,
     TopicPaginatedResponse,
@@ -13,6 +11,8 @@ from app.api.v1.topic.schemas import (
     TopicUpdate,
 )
 from app.db.session import get_session
+from app.repositories.course_repository import CourseRepository
+from app.repositories.topic_repository import TopicRepository
 from app.services.course_service import CourseService
 from app.services.topic_service import TopicService
 

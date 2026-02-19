@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.v1.institution.repository import InstitutionRepository
 from app.api.v1.institution.schemas import (
     InstitutionCreate,
     InstitutionPaginatedResponse,
@@ -11,6 +10,7 @@ from app.api.v1.institution.schemas import (
     InstitutionUpdate,
 )
 from app.db.session import get_session
+from app.repositories.institution_repository import InstitutionRepository
 from app.services.institution_service import InstitutionService
 
 institution_router = APIRouter(tags=["Institution"])
