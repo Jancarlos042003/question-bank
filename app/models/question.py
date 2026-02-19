@@ -52,6 +52,6 @@ class Question(Base):
     question_sources: Mapped[list["QuestionSource"]] = relationship(
         back_populates="question", cascade="all, delete-orphan", lazy="selectin"
     )
-    solution: Mapped["Solution"] = relationship(
-        back_populates="question", cascade="all", lazy="raise", uselist=False
+    solutions: Mapped[list["Solution"]] = relationship(
+        back_populates="question", cascade="all", lazy="raise"
     )
