@@ -124,8 +124,7 @@ class QuestionRepository:
 
         try:
             self.db.commit()
-            return db_question
-            # No se realizan un refresh ya que se devuelve un estado 204
+            # No se realizan un refresh ni se retorna nada ya que se devuelve un estado 204
         except SQLAlchemyError:
             self.db.rollback()
             raise
