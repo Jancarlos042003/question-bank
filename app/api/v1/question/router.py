@@ -40,7 +40,10 @@ question_router = APIRouter(tags=["Question"])
 
 
 @question_router.post(
-    "", response_model=QuestionCreateResponse, status_code=status.HTTP_201_CREATED
+    "",
+    response_model=QuestionCreateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Crear pregunta",
 )
 async def add_question(
         service: Annotated[QuestionService, Depends(get_question_service)],
