@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.question.schemas import (
-    QuestionAreasSectionResponse,
+    # QuestionAreasSectionResponse,
     QuestionAreasSpecificUpdate,
     QuestionCreateInput,
     QuestionPaginatedDetailResponse,
@@ -234,10 +234,10 @@ class QuestionService:
             self, question_id: int, payload: QuestionAreasSpecificUpdate
     ):
         areas = self.area_service.get_areas(payload.area_ids)
-        updated_question = self._update_question_fields(
+
+        self._update_question_fields(
             question_id=question_id, update_data={"areas": areas}
         )
-        return QuestionAreasSectionResponse.model_validate(updated_question)
 
     def _update_question_fields(self, question_id: int, update_data: dict):
         try:
@@ -268,8 +268,6 @@ class QuestionService:
             raise ResourceNotFoundException(
                 message=f"Pregunta con ID {question_id} no encontrada."
             )
-
-        return updated_question
 
     def delete_question(self, question_id: int):
         try:

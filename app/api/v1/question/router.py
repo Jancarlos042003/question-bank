@@ -11,7 +11,6 @@ from app.api.v1.question.dependencies import (
     get_solution_service,
 )
 from app.api.v1.question.schemas import (
-    QuestionAreasSectionResponse,
     QuestionAreasSpecificUpdate,
     QuestionCreateInput,
     QuestionCreateResponse,
@@ -147,7 +146,8 @@ def update_question_difficulty_specific(
 
 @question_router.patch(
     "/{question_id}/areas",
-    response_model=QuestionAreasSectionResponse,
+    # response_model=QuestionAreasSectionResponse,
+    status_code=status.HTTP_204_NO_CONTENT,
     summary="Actualizar áreas de pregunta",
 )
 def update_question_areas_specific(

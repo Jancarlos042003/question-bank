@@ -112,6 +112,7 @@ class QuestionRepository:
         return self.db.scalar(stmt) is not None
 
     def update_question_fields_db(self, question_id: int, update_data: dict):
+        """Actualiza los campos areas, difficulty, question type, subtopic de una pregunta en la BD"""
         stmt = select(Question).where(Question.id == question_id)
         db_question = self.db.scalar(stmt)
 
@@ -123,8 +124,8 @@ class QuestionRepository:
 
         try:
             self.db.commit()
-            self.db.refresh(db_question)
             return db_question
+            # No se realizan un refresh ya que se devuelve un estado 204
         except SQLAlchemyError:
             self.db.rollback()
             raise
