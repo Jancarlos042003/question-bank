@@ -146,7 +146,6 @@ def update_question_difficulty_specific(
 
 @question_router.patch(
     "/{question_id}/areas",
-    # response_model=QuestionAreasSectionResponse,
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Actualizar áreas de pregunta",
 )
