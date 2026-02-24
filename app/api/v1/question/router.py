@@ -121,9 +121,7 @@ def update_question_type_specific(
         payload: QuestionTypeSpecificUpdate,
 ):
     """Actualiza el tipo de una pregunta."""
-    service.update_question_type(
-        question_id=question_id, payload=payload
-    )
+    service.update_question_type(question_id=question_id, payload=payload)
     return None
 
 
@@ -138,9 +136,7 @@ def update_question_subtopic_specific(
         payload: QuestionSubtopicSpecificUpdate,
 ):
     """Actualiza el subtema de una pregunta."""
-    service.update_question_subtopic(
-        question_id=question_id, payload=payload
-    )
+    service.update_question_subtopic(question_id=question_id, payload=payload)
     return None
 
 
@@ -155,9 +151,7 @@ def update_question_difficulty_specific(
         payload: QuestionDifficultySpecificUpdate,
 ):
     """Actualiza la dificultad de una pregunta."""
-    service.update_question_difficulty(
-        question_id=question_id, payload=payload
-    )
+    service.update_question_difficulty(question_id=question_id, payload=payload)
     return None
 
 
@@ -172,9 +166,7 @@ def update_question_areas_specific(
         payload: QuestionAreasSpecificUpdate,
 ):
     """Actualiza las áreas de una pregunta."""
-    service.update_question_areas(
-        question_id=question_id, payload=payload
-    )
+    service.update_question_areas(question_id=question_id, payload=payload)
     return None
 
 
