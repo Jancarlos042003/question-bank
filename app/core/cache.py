@@ -10,14 +10,15 @@ redis_client = Redis(
 )
 
 
-def set_cached_count(count: int, key: str = "questions:total_count", ttl: int = 300):
+def set_cached_count(name: str, value: int, ttl: int = 300):
     """Guardar count en cache (TTL en segundos)"""
-    redis_client.setex(key, ttl, count)
+    # redis_client.setex(key, ttl, count)
+    redis_client.set(name=name, value=value, ex=ttl)
 
 
-def get_cached_count(key: str = "questions:total_count") -> int | None:
+def get_cached_count(name: str) -> int | None:
     """Obtener count cacheado"""
-    cached = redis_client.get(key)
+    cached = redis_client.get(name)
     return int(cached) if cached else None
 
 
