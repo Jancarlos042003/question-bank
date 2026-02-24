@@ -19,6 +19,8 @@ class QuestionRepository:
             self.db.commit()
             self.db.refresh(question)
 
+            invalidate_count_cache("questions:total_count")
+
         # No se necesita capturar IntegrityError porque ya hereda de SQLAlchemyError
         except SQLAlchemyError:
             self.db.rollback()
@@ -80,7 +82,7 @@ class QuestionRepository:
                 return False
 
             self.db.commit()
-            invalidate_count_cache()
+            invalidate_count_cache("questions:total_count")
             return True
         except SQLAlchemyError:
             self.db.rollback()
