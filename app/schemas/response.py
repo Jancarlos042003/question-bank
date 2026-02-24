@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 from pydantic.generics import GenericModel
 
 T = TypeVar("T")  # data
-M = TypeVar("M", bound=BaseModel)  # meta (cualquier BaseModel)
+M = TypeVar("M", default=BaseModel)  # meta
 
 
 class ApiResponse(GenericModel, Generic[T, M]):
