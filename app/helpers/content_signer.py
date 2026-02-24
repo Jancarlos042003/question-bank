@@ -7,8 +7,8 @@ class SignableContent(Protocol):
 
 
 def sign_image_contents(
-    contents: Iterable[SignableContent],
-    sign_storage_object_name: Callable[[str], str],
+        contents: Iterable[SignableContent],
+        sign_storage_object_name: Callable[[str], str],
 ) -> None:
     for content in contents:
         content_type = getattr(content.type, "value", content.type)

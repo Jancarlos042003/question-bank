@@ -3,17 +3,15 @@ import logging
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.question.schemas import (
-    # QuestionAreasSectionResponse,
     QuestionAreasSpecificUpdate,
     QuestionCreateInput,
-    QuestionPaginatedDetailResponse,
-    QuestionPaginatedSummaryResponse,
     QuestionDetailPublic,
     QuestionDifficultySpecificUpdate,
     QuestionSubtopicSpecificUpdate,
     QuestionSummaryPublic,
     QuestionTypeSpecificUpdate,
 )
+from app.core.cache import get_cached_count
 from app.core.exceptions.domain import (
     DuplicateValueError,
     ForeignKeyViolationError,
@@ -21,6 +19,7 @@ from app.core.exceptions.domain import (
 )
 from app.core.exceptions.technical import DeleteError, PersistenceError, RetrievalError
 from app.domain.question.hash import generate_question_hash
+from app.helpers.content_signer import sign_image_contents
 from app.models.choice import Choice
 from app.models.choice_content import ChoiceContent
 from app.models.question import Question
@@ -30,7 +29,6 @@ from app.models.solution import Solution
 from app.models.solution_content import SolutionContent
 from app.repositories.question_repository import QuestionRepository
 from app.services.area_service import AreaService
-from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.source_service import SourceService
 
@@ -141,45 +139,31 @@ class QuestionService:
     def get_all_questions(self, page: int, limit: int, view: str):
         """Obtiene todas las preguntas."""
         try:
-            questions_page = self.question_repository.get_questions_db(
+            questions = self.question_repository.get_questions_db(
                 page=page, limit=limit, view=view
             )
         except SQLAlchemyError as e:
             logger.exception("Error al obtener las preguntas")
             raise RetrievalError("Error al obtener las preguntas") from e
 
+        # Obtener el total de preguntas de caché
+        total = get_cached_count()
+
         # Generar URLs firmadas para todas las imágenes
-        for question in questions_page.items:
+        for question in questions:
             self._sign_question_images(question, view)
 
         if view == "summary":
             items = [
-                QuestionSummaryPublic.model_validate(question)
-                for question in questions_page.items
+                QuestionSummaryPublic.model_validate(question) for question in questions
             ]
-            return QuestionPaginatedSummaryResponse(
-                total_count=questions_page.total_count,
-                total_pages=questions_page.total_pages,
-                current_page=questions_page.current_page,
-                items_count=questions_page.items_count,
-                has_prev=questions_page.has_prev,
-                has_next=questions_page.has_next,
-                items=items,
-            )
+
+            return items, total
 
         items = [
-            QuestionDetailPublic.model_validate(question)
-            for question in questions_page.items
+            QuestionDetailPublic.model_validate(question) for question in questions
         ]
-        return QuestionPaginatedDetailResponse(
-            total_count=questions_page.total_count,
-            total_pages=questions_page.total_pages,
-            current_page=questions_page.current_page,
-            items_count=questions_page.items_count,
-            has_prev=questions_page.has_prev,
-            has_next=questions_page.has_next,
-            items=items,
-        )
+        return items, total
 
     def get_question(self, question_id: int, view: str):
         try:

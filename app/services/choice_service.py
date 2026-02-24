@@ -10,9 +10,9 @@ from app.core.exceptions.domain import (
     ResourceNotFoundException,
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
-from app.repositories.choice_repository import ChoiceRepository
+from app.helpers.content_signer import sign_image_contents
 from app.models.choice_content import ChoiceContent
-from app.services.content_signer import sign_image_contents
+from app.repositories.choice_repository import ChoiceRepository
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
 
@@ -98,7 +98,9 @@ class ChoiceService:
             logger.exception("Error al actualizar alternativa")
             raise PersistenceError("Error al actualizar la alternativa") from e
 
-        sign_image_contents(updated_choice.contents, self.image_service.generate_signature)
+        sign_image_contents(
+            updated_choice.contents, self.image_service.generate_signature
+        )
         return ChoicePublic.model_validate(updated_choice)
 
     def _validate_other_correct_choice_exists(self, question_id: int, choice_id: int):

@@ -14,8 +14,8 @@ from app.core.exceptions.domain import (
 )
 from app.core.exceptions.technical import PersistenceError, RetrievalError
 from app.domain.question.hash import generate_question_hash
+from app.helpers.content_signer import sign_image_contents
 from app.repositories.question_content_repository import QuestionContentRepository
-from app.services.content_signer import sign_image_contents
 from app.services.image_service import ImageService
 from app.services.question_guard_service import QuestionGuardService
 
