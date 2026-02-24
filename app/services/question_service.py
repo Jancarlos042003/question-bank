@@ -147,7 +147,7 @@ class QuestionService:
             raise RetrievalError("Error al obtener las preguntas") from e
 
         # Obtener el total de preguntas de caché
-        total = get_cached_count()
+        total = get_cached_count("questions:total_count")
 
         # Generar URLs firmadas para todas las imágenes
         for question in questions:

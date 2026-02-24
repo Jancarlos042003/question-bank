@@ -4,15 +4,15 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.topic.schemas import (
     TopicCreate,
-    TopicPaginatedResponse,
     TopicPublic,
     TopicPublicNoDescription,
     TopicUpdate,
 )
+from app.core.cache import get_cached_count
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import DeleteError, PersistenceError
-from app.services.course_service import CourseService
 from app.repositories.topic_repository import TopicRepository
+from app.services.course_service import CourseService
 
 logger = logging.getLogger(__name__)
 
@@ -47,23 +47,18 @@ class TopicService:
 
     def get_topics(self, page: int, limit: int):
         try:
-            topics_page = self.repository.get_topics(page, limit)
+            topics = self.repository.get_topics(page, limit)
         except SQLAlchemyError as e:
             logger.error(
                 f"Error al listar tópicos desde la base de datos (page={page}, limit={limit}): {e}"
             )
             raise PersistenceError("Error al listar los tópicos desde la base de datos")
 
-        items = [TopicPublic.model_validate(topic) for topic in topics_page.items]
-        return TopicPaginatedResponse(
-            total_count=topics_page.total_count,
-            total_pages=topics_page.total_pages,
-            current_page=topics_page.current_page,
-            items_count=topics_page.items_count,
-            has_prev=topics_page.has_prev,
-            has_next=topics_page.has_next,
-            items=items,
-        )
+        items = [TopicPublic.model_validate(topic) for topic in topics.items]
+
+        total = get_cached_count("topics:total_count")
+
+        return items, total
 
     def create_topic(self, topic: TopicCreate):
         # Validar que el ID de curso (FK) exista

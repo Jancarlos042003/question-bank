@@ -4,14 +4,14 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.v1.subtopic.schemas import (
     SubtopicCreate,
-    SubtopicPaginatedResponse,
     SubtopicPublic,
     SubtopicUpdate,
 )
+from app.core.cache import get_cached_count
 from app.core.exceptions.domain import ResourceNotFoundException
 from app.core.exceptions.technical import PersistenceError, RetrievalError, DeleteError
-from app.services.topic_service import TopicService
 from app.repositories.subtopic_repository import SubtopicRepository
+from app.services.topic_service import TopicService
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class SubtopicService:
 
     def get_subtopics(self, page: int, limit: int):
         try:
-            subtopics_page = self.repository.get_subtopics(page, limit)
+            subtopics = self.repository.get_subtopics(page, limit)
         except SQLAlchemyError as e:
             logger.exception(f"Error al listar subtemas (page={page}, limit={limit})")
             raise RetrievalError(
@@ -46,17 +46,12 @@ class SubtopicService:
             ) from e
 
         items = [
-            SubtopicPublic.model_validate(subtopic) for subtopic in subtopics_page.items
+            SubtopicPublic.model_validate(subtopic) for subtopic in subtopics.items
         ]
-        return SubtopicPaginatedResponse(
-            total_count=subtopics_page.total_count,
-            total_pages=subtopics_page.total_pages,
-            current_page=subtopics_page.current_page,
-            items_count=subtopics_page.items_count,
-            has_prev=subtopics_page.has_prev,
-            has_next=subtopics_page.has_next,
-            items=items,
-        )
+
+        total = get_cached_count("subtopics:total_count")
+
+        return items, total
 
     def create_subtopic(self, subtopic: SubtopicCreate):
         # Validar que el ID de topic (FK) exista
