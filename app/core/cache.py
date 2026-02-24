@@ -12,7 +12,6 @@ redis_client = Redis(
 
 def set_cached_count(name: str, value: int, ttl: int = 300):
     """Guardar count en cache (TTL en segundos)"""
-    # redis_client.setex(key, ttl, count)
     redis_client.set(name=name, value=value, ex=ttl)
 
 
@@ -22,6 +21,6 @@ def get_cached_count(name: str) -> int | None:
     return int(cached) if cached else None
 
 
-def invalidate_count_cache(key: str = "questions:total_count"):
+def invalidate_count_cache(name: str):
     """Invalidar cache cuando se crean/eliminan preguntas"""
-    redis_client.delete(key)
+    redis_client.delete(name)
