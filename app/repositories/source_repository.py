@@ -27,7 +27,7 @@ class SourceRepository:
             total = self.db.scalar(select(func.count()).select_from(Source))
             set_cached_count(name="sources:total_count", value=total, ttl=300)
 
-        return items, total
+        return items
 
     def get_sources_by_ids(self, ids: list[int]):
         stmt = select(Source).where(Source.id.in_(ids))

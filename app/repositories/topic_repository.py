@@ -27,7 +27,7 @@ class TopicRepository:
             total = self.db.scalar(select(func.count()).select_from(Topic))
             set_cached_count(name="topics:total_count", value=total, ttl=300)
 
-        return items, total
+        return items
 
     def create_topic(self, topic_data: Mapping[str, object]):
         db_topic = Topic(**topic_data)

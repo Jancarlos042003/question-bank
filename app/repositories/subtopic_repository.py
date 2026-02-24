@@ -29,7 +29,7 @@ class SubtopicRepository:
             total = self.db.scalar(select(func.count()).select_from(Subtopic))
             set_cached_count(name="subtopics:total_count", value=total, ttl=300)
 
-        return items, total
+        return items
 
     def create_subtopic(self, subtopic_data: Mapping[str, object]):
         db_subtopic = Subtopic(**subtopic_data)

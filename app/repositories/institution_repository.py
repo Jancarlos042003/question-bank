@@ -30,7 +30,7 @@ class InstitutionRepository:
             # Guardar en caché por 5 minutos
             set_cached_count(name="institutions:total_count", value=total, ttl=300)
 
-        return items, total
+        return items
 
     def get_institutions_by_ids(self, ids: list[int]):
         stmt = select(Institution).where(Institution.id.in_(ids))
