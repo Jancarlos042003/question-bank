@@ -110,9 +110,7 @@ class QuestionCreateInput(QuestionBase):
                         "Las respuestas deben ser únicas. "
                         f"Contenido duplicado: '{normalized}'"
                     )
-                    raise DuplicateChoiceContentError(
-                        message
-                    )
+                    raise DuplicateChoiceContentError(message)
 
                 unique_choices.add(normalized)
 
@@ -280,28 +278,6 @@ class QuestionDetailPublic(BaseModel):
 
             out.append(str(item))
         return out
-
-
-class QuestionPaginatedSummaryResponse(BaseModel):
-    total_count: int
-    total_pages: int
-    current_page: int
-    items_count: int
-    has_prev: bool
-    has_next: bool
-    items: list[QuestionSummaryPublic]
-    model_config = ConfigDict(from_attributes=True)
-
-
-class QuestionPaginatedDetailResponse(BaseModel):
-    total_count: int
-    total_pages: int
-    current_page: int
-    items_count: int
-    has_prev: bool
-    has_next: bool
-    items: list[QuestionDetailPublic]
-    model_config = ConfigDict(from_attributes=True)
 
 
 # Para simulacros exámenes
