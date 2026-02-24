@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.subtopic.schemas import (
     SubtopicCreate,
-    SubtopicPaginatedResponse,
     SubtopicPublic,
     SubtopicUpdate,
 )
 from app.db.session import get_session
+from app.helpers.build_paginated import build_paginated_response
+from app.schemas.pagination import PaginationMeta
+from app.schemas.response import ApiResponse
 from app.repositories.subtopic_repository import SubtopicRepository
 from app.repositories.topic_repository import TopicRepository
 from app.services.subtopic_service import SubtopicService
@@ -34,7 +36,7 @@ def get_subtopic_service(
 
 @subtopic_router.post(
     "",
-    response_model=SubtopicPublic,
+    response_model=ApiResponse[SubtopicPublic],
     status_code=status.HTTP_201_CREATED,
     summary="Crea un nuevo subtema",
 )
@@ -43,12 +45,13 @@ def add_subtopic(
         subtopic: SubtopicCreate,
 ):
     """Crea un nuevo subtema con los datos proporcionados."""
-    return service.create_subtopic(subtopic)
+    created_subtopic = service.create_subtopic(subtopic)
+    return {"data": created_subtopic}
 
 
 @subtopic_router.get(
     "",
-    response_model=SubtopicPaginatedResponse,
+    response_model=ApiResponse[list[SubtopicPublic], PaginationMeta],
     summary="Lista de subtemas",
 )
 def read_subtopics(
@@ -59,12 +62,13 @@ def read_subtopics(
         ] = 100,
 ):
     """Recupera una lista de subtemas con soporte de paginación."""
-    return service.get_subtopics(page, limit)
+    items, total = service.get_subtopics(page, limit)
+    return build_paginated_response(items=items, total=total, page=page, limit=limit)
 
 
 @subtopic_router.get(
     "/{subtopic_id}",
-    response_model=SubtopicPublic,
+    response_model=ApiResponse[SubtopicPublic],
     summary="Obtener un subtema por ID",
 )
 def read_subtopic(
@@ -74,12 +78,13 @@ def read_subtopic(
     """
     Recupera los detalles de un subtema específico utilizando su identificador único.
     """
-    return service.get_subtopic(subtopic_id)
+    subtopic = service.get_subtopic(subtopic_id)
+    return {"data": subtopic}
 
 
 @subtopic_router.patch(
     "/{subtopic_id}",
-    response_model=SubtopicPublic,
+    response_model=ApiResponse[SubtopicPublic],
     summary="Actualizar un subtema",
 )
 def update_subtopic(
@@ -88,7 +93,8 @@ def update_subtopic(
         subtopic: SubtopicUpdate,
 ):
     """Actualiza la información de un subtema existente."""
-    return service.update_subtopic(subtopic_id, subtopic)
+    updated_subtopic = service.update_subtopic(subtopic_id, subtopic)
+    return {"data": updated_subtopic}
 
 
 @subtopic_router.delete(
