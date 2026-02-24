@@ -5,12 +5,14 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.topic.schemas import (
     TopicCreate,
-    TopicPaginatedResponse,
     TopicPublic,
     TopicPublicNoDescription,
     TopicUpdate,
 )
 from app.db.session import get_session
+from app.helpers.build_paginated import build_paginated_response
+from app.schemas.pagination import PaginationMeta
+from app.schemas.response import ApiResponse
 from app.repositories.course_repository import CourseRepository
 from app.repositories.topic_repository import TopicRepository
 from app.services.course_service import CourseService
@@ -36,7 +38,7 @@ def get_topic_service(
 
 @topic_router.post(
     "",
-    response_model=TopicPublic,
+    response_model=ApiResponse[TopicPublic],
     status_code=status.HTTP_201_CREATED,
     summary="Crea un nuevo tema",
 )
@@ -44,10 +46,15 @@ def add_topic(
         service: Annotated[TopicService, Depends(get_topic_service)], topic: TopicCreate
 ):
     """Crea un nuevo tema con los datos proporcionados."""
-    return service.create_topic(topic)
+    created_topic = service.create_topic(topic)
+    return {"data": created_topic}
 
 
-@topic_router.get("", response_model=TopicPaginatedResponse, summary="Lista de temas")
+@topic_router.get(
+    "",
+    response_model=ApiResponse[list[TopicPublic], PaginationMeta],
+    summary="Lista de temas",
+)
 def read_topics(
         service: Annotated[TopicService, Depends(get_topic_service)],
         page: Annotated[int, Query(ge=1, description="Número de página")] = 1,
@@ -56,12 +63,13 @@ def read_topics(
         ] = 50,
 ):
     """Recupera una lista de temas con soporte de paginación."""
-    return service.get_topics(page, limit)
+    items, total = service.get_topics(page, limit)
+    return build_paginated_response(items=items, total=total, page=page, limit=limit)
 
 
 @topic_router.get(
     "/{topic_id}",
-    response_model=TopicPublic | TopicPublicNoDescription,
+    response_model=ApiResponse[TopicPublic | TopicPublicNoDescription],
     summary="Obtener un tema",
 )
 def read_topic(
@@ -72,11 +80,12 @@ def read_topic(
         ] = True,
 ):
     """Recupera los detalles de un tema específico utilizando su ID."""
-    return service.get_topic(topic_id, include_description)
+    topic = service.get_topic(topic_id, include_description)
+    return {"data": topic}
 
 
 @topic_router.patch(
-    "/{topic_id}", response_model=TopicPublic, summary="Actualizar un tema"
+    "/{topic_id}", response_model=ApiResponse[TopicPublic], summary="Actualizar un tema"
 )
 def update_topic(
         service: Annotated[TopicService, Depends(get_topic_service)],
@@ -84,7 +93,8 @@ def update_topic(
         topic: TopicUpdate,
 ):
     """Actualiza la información de un tema existente."""
-    return service.update_topic(topic_id, topic)
+    updated_topic = service.update_topic(topic_id, topic)
+    return {"data": updated_topic}
 
 
 @topic_router.delete(
