@@ -1,12 +1,11 @@
-import math
 from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.cache import get_cached_count, set_cached_count
 from app.models.source import Source
-from app.repositories.pagination import PaginatedResult
 
 
 class SourceRepository:
@@ -17,27 +16,18 @@ class SourceRepository:
         stmt = select(Source).where(Source.id == source_id)
         return self.db.scalar(stmt)
 
-    def get_sources(self, page: int, limit: int) -> PaginatedResult[Source]:
+    def get_sources(self, page: int, limit: int):
         offset = (page - 1) * limit
 
         stmt = select(Source).offset(offset).limit(limit)
         items = list(self.db.scalars(stmt).all())
 
-        total_count = self.db.scalar(select(func.count()).select_from(Source))
-        total_pages = max(1, math.ceil(total_count / limit))
+        total = get_cached_count("sources:total_count")
+        if total is None:
+            total = self.db.scalar(select(func.count()).select_from(Source))
+            set_cached_count(name="sources:total_count", value=total, ttl=300)
 
-        has_prev = page > 1
-        has_next = page < total_pages
-
-        return PaginatedResult(
-            total_count=total_count,
-            total_pages=total_pages,
-            current_page=page,
-            items_count=len(items),
-            has_prev=has_prev,
-            has_next=has_next,
-            items=items,
-        )
+        return items, total
 
     def get_sources_by_ids(self, ids: list[int]):
         stmt = select(Source).where(Source.id.in_(ids))

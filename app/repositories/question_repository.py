@@ -45,12 +45,12 @@ class QuestionRepository:
 
         # GUARDAR EL TOTAL DE PREGUNTAS EN CACHÉ
         # Intentar obtener del cache
-        total = get_cached_count()
+        total = get_cached_count(name="questions:total_count")
         if total is None:
             # Si no está en cache, consultar BD
             total = self.db.scalar(select(func.count()).select_from(Question))
             # Guardar en cache por 5 minutos
-            set_cached_count(count=total, ttl=300)
+            set_cached_count(name="questions:total_count", value=total, ttl=300)
 
         # Obtener preguntas
         return list(self.db.scalars(stmt).all())  # Convertir el Sequence a list

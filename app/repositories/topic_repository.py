@@ -1,12 +1,11 @@
-import math
 from collections.abc import Mapping
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.cache import get_cached_count, set_cached_count
 from app.models.topic import Topic
-from app.repositories.pagination import PaginatedResult
 
 
 class TopicRepository:
@@ -17,28 +16,18 @@ class TopicRepository:
         stmt = select(Topic).where(Topic.id == topic_id)
         return self.db.scalar(stmt)
 
-    def get_topics(self, page: int, limit: int) -> PaginatedResult[Topic]:
+    def get_topics(self, page: int, limit: int):
         offset = (page - 1) * limit
 
         stmt = select(Topic).offset(offset).limit(limit)
         items = list(self.db.scalars(stmt).all())
 
-        total_count = self.db.scalar(select(func.count()).select_from(Topic))
+        total = get_cached_count("topics:total_count")
+        if total is None:
+            total = self.db.scalar(select(func.count()).select_from(Topic))
+            set_cached_count(name="topics:total_count", value=total, ttl=300)
 
-        total_pages = max(1, math.ceil(total_count / limit))
-
-        has_prev = page > 1
-        has_next = page < total_pages
-
-        return PaginatedResult(
-            total_count=total_count,
-            total_pages=total_pages,
-            current_page=page,
-            items_count=len(items),
-            has_prev=has_prev,
-            has_next=has_next,
-            items=items,
-        )
+        return items, total
 
     def create_topic(self, topic_data: Mapping[str, object]):
         db_topic = Topic(**topic_data)

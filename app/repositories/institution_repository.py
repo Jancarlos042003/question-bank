@@ -1,12 +1,11 @@
-import math
 from collections.abc import Mapping
 
-from sqlalchemy import func, select
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.cache import get_cached_count, set_cached_count
 from app.models.institution import Institution
-from app.repositories.pagination import PaginatedResult
 
 
 class InstitutionRepository:
@@ -17,27 +16,21 @@ class InstitutionRepository:
         stmt = select(Institution).where(Institution.id == institution_id)
         return self.db.scalar(stmt)
 
-    def get_institutions(self, page: int, limit: int) -> PaginatedResult[Institution]:
+    def get_institutions(self, page: int, limit: int):
         offset = (page - 1) * limit
 
         stmt = select(Institution).offset(offset).limit(limit)
         items = list(self.db.scalars(stmt).all())
 
-        total_count = self.db.scalar(select(func.count()).select_from(Institution))
-        total_pages = max(1, math.ceil(total_count / limit))
+        # Intentar obtener del caché
+        total = get_cached_count(name="institutions:total_count")
 
-        has_prev = page > 1
-        has_next = page < total_pages
+        if total is None:
+            total = self.db.scalar(select(func.count()).select_from(Institution))
+            # Guardar en caché por 5 minutos
+            set_cached_count(name="institutions:total_count", value=total, ttl=300)
 
-        return PaginatedResult(
-            total_count=total_count,
-            total_pages=total_pages,
-            current_page=page,
-            items_count=len(items),
-            has_prev=has_prev,
-            has_next=has_next,
-            items=items,
-        )
+        return items, total
 
     def get_institutions_by_ids(self, ids: list[int]):
         stmt = select(Institution).where(Institution.id.in_(ids))
