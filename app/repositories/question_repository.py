@@ -1,14 +1,11 @@
-import math
-
-from sqlalchemy import func, select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
 
-from app.core.cache import get_cached_count, invalidate_count_cache, set_cached_count
+from app.core.cache import invalidate_count_cache, get_cached_count, set_cached_count
 from app.models.choice import Choice
 from app.models.question import Question
 from app.models.solution import Solution
-from app.repositories.pagination import PaginatedResult
 
 
 class QuestionRepository:
@@ -29,9 +26,7 @@ class QuestionRepository:
         else:
             return question
 
-    def get_questions_db(
-            self, page: int, limit: int, view: str
-    ) -> PaginatedResult[Question]:
+    def get_questions_db(self, page: int, limit: int, view: str):
         offset = (page - 1) * limit
 
         if view == "summary":
@@ -48,10 +43,7 @@ class QuestionRepository:
                 )
             )
 
-        # Obtener preguntas
-        questions = list(self.db.scalars(stmt).all())  # Convertir el Sequence a list
-
-        # Obtener total
+        # GUARDAR EL TOTAL DE PREGUNTAS EN CACHÉ
         # Intentar obtener del cache
         total = get_cached_count()
         if total is None:
@@ -60,21 +52,8 @@ class QuestionRepository:
             # Guardar en cache por 5 minutos
             set_cached_count(count=total, ttl=300)
 
-        # Calcular número de páginas
-        pages = math.ceil(total / limit)
-
-        has_next = page < pages
-        has_prev = page > 1
-
-        return PaginatedResult(
-            total_count=total,
-            total_pages=pages,
-            current_page=page,
-            items_count=len(questions),
-            has_prev=has_prev,
-            has_next=has_next,
-            items=questions,
-        )
+        # Obtener preguntas
+        return list(self.db.scalars(stmt).all())  # Convertir el Sequence a list
 
     def get_question_db(self, question_id: int, view: str):
         if view == "summary":
